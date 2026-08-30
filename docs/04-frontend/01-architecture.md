@@ -10,12 +10,15 @@ src/frontend/
 ├── public/                 # favicon.svg, pwa-192x192.svg
 ├── src/
 │   ├── main.tsx            # boots React, registers service worker
-│   ├── app/router.tsx      # React Router (createBrowserRouter) + AppShell
-│   ├── components/layout/AppShell.tsx
+│   ├── app/router.tsx      # React Router (createBrowserRouter) + RequireAuth/GuestOnly
+│   ├── components/layout/AppShell.tsx  # signed-in user + role + sign-out
 │   ├── features/
+│   │   ├── auth/           # login + 2FA, store, token refresh, guards
 │   │   ├── home/HomePage.tsx
 │   │   └── units/          # UnitToggle.tsx, convert.ts (pure), convert.test.ts
-│   ├── lib/api.ts          # fetch-based API client (VITE_API_BASE_URL or /api proxy)
+│   ├── lib/
+│   │   ├── api.ts          # feature API calls (convertMeasure)
+│   │   └── http.ts         # fetch wrapper: Bearer, idempotency, ApiError + parseProblem
 │   └── vite-env.d.ts
 ```
 
@@ -26,6 +29,14 @@ src/frontend/
 - **Path alias:** `@/* → src/*`.
 - **State/offline:** Zustand (global state) + Dexie (IndexedDB) — pulled in for the Phase-2 offline shift queue.
 - **Styling:** Tailwind (`primary #142d55`, `accent #2980b9`; uses default `slate` scale).
+
+## Auth & security (Phase 1)
+
+- **Auth store** (`features/auth/authStore.ts`): Zustand + `persist` (tokens/email/role persist across reloads).
+- **Route guards** (`features/auth/guards.tsx`): `RequireAuth` redirects anonymous users to `/login`, `GuestOnly` redirects signed-in users away from `/login`.
+- **Token refresh** (`features/auth/tokenManager.ts`): single-flight refresh; a failed rotation clears the session (reuse-detection logout).
+- **HTTP client** (`lib/http.ts`): injects `Authorization: Bearer`, adds `Idempotency-Key` for mutating calls, normalizes RFC-7807 errors into `ApiError`.
+- **Login page** (`features/auth/LoginPage.tsx`): email/password → optional 2FA challenge step → token session; uses a persisted `deviceId`.
 
 ## Code organization rules
 

@@ -220,6 +220,54 @@ This is a **verification-only** install — do not assume it persists in a fresh
 
 ---
 
+### 015 — Integration tests that need a real DB must NOT live in the main solution
+
+**Symptom:** Adding a `WebApplicationFactory` integration-test project to `Karry.sln` would make `dotnet test Karry.sln` try to connect to Postgres — which doesn't exist on the authoring machine (no Docker/sudo), breaking the local "headless" green run.
+
+**Root cause:** The environment can compile but not run against a live Postgres, and the distribution of a solution folder implies all its test projects run together.
+
+**Fix:** Kept integration tests in a **separate solution** (`Karry.IntegrationTests.sln`) that is **not** referenced by `Karry.sln`. The `WebApplicationFactory` fixture checks for a `ConnectionStrings__KarryDatabase` env var and **skips** when absent, so the project also compiles fine locally. A dedicated CI job starts a `postgres:16` service container, sets the env vars, and runs only that solution.
+
+**Rule:** DB-dependent integration tests → own solution + CI-only execution; keep the fast unit-test solution DB-independent.
+
+---
+
+### 016 — `Seed:AdminPassword` is required and must be injected in the env
+
+**Symptom:** `DbSeeder` constructor throws `InvalidOperationException: Seed:AdminPassword is required.` The default `appsettings.json` only carries `Seed:Enabled` and `Seed:AdminEmail`, so running with `Seed:Enabled=true` and no password crashes.
+
+**Root cause:** The seeder deliberately refuses to guess a super-admin password in a non-development seed (defaults admin email to `root@kar.app` but has no sane default password).
+
+**Fix:** Every seed path (CI integration job, compose, prod) sets `Seed__AdminPassword` explicitly. The integration test reads it (falling back to `Karry#RootAdmin1` to match CI).
+
+**Rule:** When enabling the seeder anywhere, supply `Seed:AdminPassword`; do not rely on `appsettings.json` defaults.
+
+---
+
+### 017 — `appsettings.Development.json` forces `Database:AutoMigrate=true`
+
+**Symptom:** Running the backend pointed at a dummy/absent connection string still attempts to migrate because the dev override flips `AutoMigrate` on.
+
+**Root cause:** Phase 0 set `Database:AutoMigrate=true` in `appsettings.Development.json` for the Docker dev flow.
+
+**Fix:** When running the backend locally without a DB, pass `Database__AutoMigrate=false` (env overrides JSON).
+
+**Rule:** Check **both** `appsettings.json` and `appsettings.<Env>.json` before assuming a config flag's effective value; `Development` overrides win locally.
+
+---
+
+### 018 — EF `AddDbContext` overload that injects a `DbConnectionInterceptor`
+
+**Symptom:** Wiring the RLS `DbConnectionInterceptor` into `AddDbContext` — the interceptor must be registered per-connection and needs the current tenant, which is not available in the static/options path.
+
+**Root cause:** `AddDbContext<DbContext>(options => ...)` has no place to pull scoped per-request state for the connection interceptor.
+
+**Fix:** Used the scoped `(IServiceProvider sp, DbContextOptionsBuilder options)` overload of `AddDbContext` so the interceptor can be constructed with access to the per-request session provider.
+
+**Rule:** For connection-level concerns that need request scoping, prefer the `(sp, options)` `AddDbContext` overload over static options.
+
+---
+
 ## Future-issue prevention checklist (run before committing backend code)
 
 - [ ] `.csproj` for any library touching HttpContext has `<FrameworkReference Include="Microsoft.AspNetCore.App" />`.
@@ -231,6 +279,10 @@ This is a **verification-only** install — do not assume it persists in a fresh
 - [ ] Sealed classes don't declare `protected` members (warnings-as-errors).
 - [ ] No duplicate method names after renames/edits.
 - [ ] Design-time EF factory exists for headless migrations.
+- [ ] DB-dependent integration tests live in their own solution, gated to CI (skip when no connection string).
+- [ ] `Seed:AdminPassword` is set wherever the seeder is enabled (CI, compose, prod).
+- [ ] Respect `appsettings.<Env>.json` overrides (e.g. `Development` forces `AutoMigrate=true`).
+- [ ] RLS/connection interceptors that need request state use the `(sp, options)` `AddDbContext` overload.
 
 ---
 

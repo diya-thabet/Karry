@@ -26,8 +26,9 @@ Named volumes: `postgres_data`, `minio_data`.
 
 ## CI/CD (`.github/workflows/ci.yml`)
 
-Runs on push/PR to `main` / `develop` — four jobs:
-- **backend** — restore → build → test (uploads TRX results)
+Runs on push/PR to `main` / `develop`:
+- **backend** — restore → build → test (uploads TRX results); uses in-memory fakes, no DB.
+- **integration** — spins up a `postgres:16` service container, sets `Database__AutoMigrate=true` + `Seed__Enabled=true` + `Seed__AdminPassword`, builds & runs `Karry.IntegrationTests.sln` (real-API milestone + RLS + lockout tests), uploads TRX results.
 - **frontend** — lint → format:check → typecheck → test → build (PWA)
 - **math-engine** — pip install -e '.[dev]' → ruff → pytest
 - **docker-images** — **on pushes only** (skipped on PRs): builds all three service images (Buildx + GHA cache) and **pushes to Docker Hub** (`dhiathabet/karry-*`, tagged `latest` + commit SHA). Requires the `DOCKERHUB_USERNAME` / `DOCKERHUB_TOKEN` repo secrets.

@@ -30,7 +30,7 @@ Layer-based docs structure. **New docs:** put them in the matching layer folder 
 | React structure, PWA, proxies | `04-frontend/01-architecture.md` |
 | Conveyor physics, RUL, engine contracts | `05-math-engine/01-architecture.md` |
 | Compose, Dockerfiles, CI jobs, env vars | `06-infrastructure/01-architecture.md` |
-| What was done in a phase | `07-execution/phaseN-*.md` |
+| What was done in a phase | `07-execution/phaseN-*.md` (`phase0-foundations-tooling.md`, `phase1-data-platform-rbac.md`) |
 | Known gotchas / hard-won fixes | `08-knowledge/llmhandsoff.md` |
 
 ## Conventions
