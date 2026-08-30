@@ -8,6 +8,7 @@ COPY ["Karry.Application/Karry.Application.csproj", "Karry.Application/"]
 COPY ["Karry.Domain/Karry.Domain.csproj", "Karry.Domain/"]
 COPY ["Karry.Infrastructure/Karry.Infrastructure.csproj", "Karry.Infrastructure/"]
 COPY ["Karry.MathEngine.Client/Karry.MathEngine.Client.csproj", "Karry.MathEngine.Client/"]
+COPY ["Directory.Build.props", "./"]
 RUN dotnet restore "Karry.Api/Karry.Api.csproj"
 
 COPY . .
