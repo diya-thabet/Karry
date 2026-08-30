@@ -1,5 +1,6 @@
 using Karry.Application.Auth;
 using Karry.Application.Auth.Commands;
+using Karry.Application.Auth.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,6 +17,12 @@ public sealed class AuthController : ControllerBase
     {
         _mediator = mediator;
     }
+
+    /// <summary>Returns the current authenticated session context (user, tenant, role, permissions).</summary>
+    [HttpGet("me")]
+    [Authorize]
+    public async Task<ActionResult<CurrentSessionResponse>> Me(CancellationToken cancellationToken)
+        => Ok(await _mediator.Send(new GetCurrentSessionQuery(), cancellationToken));
 
     /// <summary>Authenticates a user. Returns tokens, or a two-factor challenge when enabled.</summary>
     [HttpPost("login")]
