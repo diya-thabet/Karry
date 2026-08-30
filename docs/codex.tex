@@ -1,0 +1,398 @@
+\documentclass[11pt, a4paper]{article}
+
+% --- UNIVERSAL PREAMBLE BLOCK ---
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2cm, right=2cm]{geometry}
+\usepackage{fontspec}
+\usepackage[english, bidi=basic, provide=*]{babel}
+
+\babelprovide[import, onchar=ids fonts]{english}
+
+% Set default/Latin font to Sans Serif in the main (rm) slot
+\babelfont{rm}{Noto Sans}
+
+% --- CORE PACKAGES ---
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{xcolor}
+
+% Define executive color palette
+\definecolor{primarynavy}{RGB}{20, 45, 85}
+\definecolor{accentblue}{RGB}{41, 128, 185}
+\definecolor{darkslate}{RGB}{44, 62, 80}
+\definecolor{lightgrey}{RGB}{245, 247, 250}
+
+% --- SECTION STYLING ---
+\usepackage{titlesec}
+\titleformat{\section}{\color{primarynavy}\Large\bfseries}{\thesection}{1em}{}[\color{accentblue}\rule{\textwidth}{1pt}]
+\titleformat{\subsection}{\color{darkslate}\large\bfseries}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}{\color{darkslate}\bfseries}{\thesubsubsection}{1em}{}
+
+% Custom itemize bullet styling
+\setlist[itemize]{label=\textcolor{accentblue}{\small$\blacksquare$}}
+
+% --- HYPERREF (MUST BE LAST PACKAGE) ---
+\usepackage[colorlinks=true, linkcolor=primarynavy, urlcolor=accentblue, citecolor=primarynavy]{hyperref}
+
+\title{%
+  \vspace{-1cm}
+  \Huge \textbf{\color{primarynavy}Karry Platform} \\
+  \Large \textbf{Enterprise Quarry \& Mining Management Operating System} \\
+  \vspace{0.3cm}
+  \large Comprehensive Technical Codex: Closed-Loop Mathematics, Hybrid Maintenance, Multi-Warehouse Logistics, PKI Signatures \& Visual Analytics
+}
+\author{\textbf{Enterprise Software Architecture Team}}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+\begin{abstract}
+\noindent
+This document establishes the master technical architecture, domain-driven design (DDD), mathematical formulations, and operational specifications for **Karry** (\textit{Application pour la Gestion de Carri\`ere}), an enterprise Software-as-a-Service (SaaS) platform engineered for civil engineering extractions, aggregate quarries, sand washing plants, and open-pit mining operations. Karry bridges physical field extractions and executive intelligence through dynamic closed-loop processing graph equations, variable conveyor belt speeds, dual-unit metric conversions ($m^3 \leftrightarrow \text{Tonnes}$), hybrid predictive maintenance tracking (Hours / KM / Calendar fallback), multi-warehouse logistics (\textit{Magasin G\'en\'eral} hub network), two-tier controller verification pipelines, native electronic PKI signatures, cryptographic anti-corruption audit ledgers, interactive visual analytics curves, weather risk delay forecasting, and an executive AI copilot layer.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+\section{Executive Summary and Strategic Vision}
+
+\subsection{Project Overview}
+The **Karry Platform** (\textit{Application pour la Gestion de Carri\`ere}) is an all-in-one enterprise operational operating system for quarrying, aggregate crushing, sand washing, and civil engineering extractions. Built as a progressive web application (PWA) with offline-first capabilities, Karry connects heavy mobile fleets, crushing plants, weighbridges, warehouse networks, shift controllers, and executive financial ledgers into a real-time, tamper-proof intelligence system.
+
+\subsection{Key Industry Vulnerabilities Addressed}
+Medium-to-large scale extraction operations globally face nine systemic operational vulnerabilities:
+\begin{enumerate}
+    \item \textbf{Field Data Fraud \& Unverified Fuel Logging}: Manual logging of engine hour meters, diesel dispatches, and scale tickets leads to fuel theft, inflated operational expenses, and falsified shift reports.
+    \item \textbf{Fixed Maintenance Metric Limitations}: Traditional maintenance software fails when engine hour meters or odometers break. Karry implements hybrid metric tracking (Engine Hours, Odometer Kilometers, or Calendar Time Fallback with automated 30-day usage switches).
+    \item \textbf{Dynamic Conveyor Belt \& Plant Speed Degradation}: Conveyor belt delivery speeds ($\text{m}^3/\text{min}$), screen feeds, and crusher outputs degrade dynamically over time due to mechanical surface wear, belt inclination angles, and wet clay saturation.
+    \item \textbf{Unpredicted Wear Component Failures}: High-value components (jaw liners, mantle pairs, polyurethane screen meshes, track shoes) break unexpectedly, causing costly plant shutdowns in remote regions where replacement transit takes weeks.
+    \item \textbf{Inaccurate Mass Yields \& Static vs. Closed-Loop Modeling}: Lack of dynamic mass-balance tracking between blasted bench volumes ($V_{\text{blast}}$) and final sellable aggregate fractions ($M_{\text{final}}$) across closed-loop recirculating screens.
+    \item \textbf{Paper-Based Bureaucracy \& Lack of Digital Signatures}: Paper signing, scanning, and physical ticket transport slow down shift approvals. Karry embeds native PKI touchscreen electronic signatures with cryptographic SHA-256 verification.
+    \item \textbf{Inter-Quarry Warehouse \& Material Leakage}: Lack of historical tracking when spare parts, crusher liners, or heavy machinery move between a Central Warehouse (\textit{Magasin G\'en\'eral}) and satellite site stores.
+    \item \textbf{Rigid Load Unit Systems}: Loading operators and weighmaster clerks cannot dynamically toggle between volumetric ($m^3$) and gravimetric ($\text{Tonnes}$) measures during field dispatch.
+    \item \textbf{Unmonitored Loan Amortization vs. Weather Risks}: Inability to compare real-time net machinery revenue ($C_{\text{ops}}$) against monthly bank financing costs ($C_{\text{loan}}$), compounded by tropical rainy season shutdowns ($R(m)$).
+\end{enumerate}
+
+\section{Domain Architecture and Mathematical Foundations}
+
+The platform relies on deterministic mathematical models to govern physical extractions, processing kinetics, wear degradation, fleet financing, and delivery scheduling.
+
+\subsection{Blast Volume Yield, Dynamic Unit Toggle, and Mass Engine}
+The in-situ rock volume $V_{\text{rock}}$ ($m^3$) extracted from a bench during a blast operation is calculated via spatial grid parameters:
+\begin{equation}
+    V_{\text{rock}} = A_{\text{pattern}} \times h_{\text{bench}} \times \cos(\theta_{\text{slope}})
+\end{equation}
+Where $A_{\text{pattern}}$ is the drill pattern surface area ($m^2$), $h_{\text{bench}}$ is bench height, and $\theta_{\text{slope}}$ is the bench face angle.
+
+Field operators (loader drivers, scale operators) are provided a **Dynamic Unit Toggle** allowing real-time conversion between volume $V$ ($m^3$) and mass $M$ ($\text{Tonnes}$) using moisture-adjusted rock density:
+\begin{equation}
+    M_{\text{raw}} = V_{\text{rock}} \times \rho_{\text{rock}} \times \kappa_{\text{moisture}}
+\end{equation}
+Where $\rho_{\text{rock}}$ is dry specific gravity ($\text{ton}/m^3$) and $\kappa_{\text{moisture}} \ge 1.0$ accounts for water saturation due to weather.
+
+The overall **Mass Yield Efficiency** ($\eta_{\text{yield}}$) across all commercial aggregate fractions ($i = 1 \dots n$) is:
+\begin{equation}
+    \eta_{\text{yield}} = \left( \frac{\sum_{i=1}^{n} M_{\text{product}_i}}{M_{\text{raw}}} \right) \times 100\%
+\end{equation}
+
+\subsection{Conveyor Belt Dynamic Production Speed \& Plant Physics Engine}
+Conveyor belts (\textit{tapis roulants} / \textit{sebta}), screen feeds, and crushers do not run at constant speeds. The instantaneous volumetric delivery rate $Q_{\text{belt}}(t)$ ($m^3/\text{min}$) is modeled dynamically:
+\begin{equation}
+    Q_{\text{belt}}(t) = Q_{\text{nominal}} \times \phi_{\text{wear}}(H_{\text{belt}}) \times \psi_{\text{inclination}}(\theta) \times \omega_{\text{weather}}(R)
+\end{equation}
+Where:
+\begin{itemize}
+    \item $Q_{\text{nominal}}$: Rated factory baseline speed (e.g., $1.0 \; m^3$ per 1.3 minutes).
+    \item $\phi_{\text{wear}} \in (0, 1]$: Degradation multiplier reflecting belt surface friction loss and roller tension wear.
+    \item $\psi_{\text{inclination}}$: Gravitational resistance factor due to conveyor incline angle $\theta$.
+    \item $\omega_{\text{weather}} \in (0, 1]$: Reduction factor due to heavy rain saturation ($R$), causing material slippage or clay adhesion.
+\end{itemize}
+
+\subsection{Closed-Loop Crusher and Screen Directed Graph Engine}
+Quarry processing plants operate as a Directed Cyclic Graph (DCG) of crushers ($C_k$) and screens ($F_j$). Oversized aggregate fractions ($D > D_{\text{max}}$) rejected by screen meshes are automatically recirculated back to secondary or tertiary crushers.
+
+The mass flow rate entering screen $j$ at time iteration $t$, denoted as $\dot{m}_{F_j}(t)$, incorporates the circulating load:
+\begin{equation}
+    \dot{m}_{F_j}(t) = \dot{m}_{\text{primary}}(t) + \sum_{k \in \text{Recirc}} \gamma_k \cdot \dot{m}_{C_k}(t - 1)
+\end{equation}
+Where $\gamma_k \in [0, 1)$ represents the fraction of oversized stones rejected back to crusher $C_k$.
+
+\subsection{Extensible Machinery Topology and Dynamic Plug-and-Play Engine}
+Every machine (crusher, screen, washer, loader, conveyor, haul truck) is abstracted as a **Graph Node Engine**:
+\begin{equation}
+    \text{Machine Node } \mathcal{M}_e = \Big\langle T_{\text{type}}, \, f_{\text{yield}}(\mathbf{x}), \, \mathbf{P}_{\text{wear}}, \, C_{\text{ops}}(e), \, \mathbf{E}_{\text{out}} \Big\rangle
+\end{equation}
+Where $T_{\text{type}}$ is machine classification, $f_{\text{yield}}(\mathbf{x})$ is the particle size distribution transfer matrix, $\mathbf{P}_{\text{wear}}$ is the vector of tracked wear parts, $C_{\text{ops}}(e)$ is operational cost, and $\mathbf{E}_{\text{out}}$ defines downstream mass routing edges.
+
+When a site manager adds a new plant component via the web interface, Karry automatically recalculates downstream mass balances, updates maintenance queues, and connects operational logs to financial ledgers without code redeployment.
+
+\subsection{Hybrid Predictive Maintenance Engine and Sensor Fallback Strategy}
+Equipment components (jaw liners, mantle pairs, polyurethane screens, engine oil, track pads) wear down based on operational stress. Karry supports three dynamic evaluation metrics:
+\begin{enumerate}
+    \item \textbf{Engine Hours ($\Delta H$)}: Primary for crushers, excavators, and loaders.
+    \item \textbf{Odometer Kilometers ($\Delta K$)}: Primary for haul trucks and mobile transport.
+    \item \textbf{Calendar Time Fallback (Days / Weeks)}: Used when meters break down (\textit{panne compteur}) or for un-metered assets.
+\end{enumerate}
+
+The **Remaining Useful Life (RUL)** for component $p$ under metric $m \in \{\text{Hours}, \text{KM}, \text{Days}\}$ is:
+\begin{equation}
+    RUL_m(p) = \min \left( \frac{U_{\text{rating}}(p) - U_{\text{accumulated}}(p)}{\bar{u}_{\text{daily}} \times \delta_{\text{abrasion}}}, \; \frac{M_{\text{rating}}(p) - M_{\text{processed}}(p)}{\bar{m}_{\text{daily}} \times \delta_{\text{abrasion}}} \right)
+\end{equation}
+Where $U_{\text{rating}}$ is rated lifespan in metric $m$, $U_{\text{accumulated}}$ is current usage, $\bar{u}_{\text{daily}}$ is daily usage rate, $M_{\text{processed}}$ is cumulative tonnage, and $\delta_{\text{abrasion}} \ge 1.0$ is the Bond abrasion index multiplier.
+
+\subsubsection{Meter Breakdown Fallback Switch}
+If an engine hour or kilometer meter hardware failure occurs, authorized managers activate a **Sensor Fallback Switch**. Karry automatically transitions metric tracking to estimated calendar usage based on the asset's historical 30-day average usage $\bar{u}_{\text{daily}}$, ensuring maintenance alerts continue without interruption.
+
+\subsubsection{Automated Spare Parts Procurement Trigger}
+To eliminate unplanned downtime, Karry triggers an automated procurement alert when:
+\begin{equation}
+    RUL_{\text{days}}(p) \le T_{\text{shipping\_lead\_time}} + \tau_{\text{buffer}}
+\end{equation}
+Where $T_{\text{shipping\_lead\_time}}$ is transit duration (e.g., 30 days for jaw plates shipped internationally) and $\tau_{\text{buffer}}$ is safety margin stock (7 days by default).
+
+\subsection{Fleet Amortization, Loan Solvency, and Weather Model}
+Total hourly operational cost $C_{\text{ops}}(a)$ for heavy asset $a$ is:
+\begin{equation}
+    C_{\text{ops}}(a) = \left( \frac{C_{\text{capital}} - S_{\text{residual}}}{H_{\text{lifespan}}} \right) + (F_{\text{conso}} \times P_{\text{fuel}}) + W_{\text{operator}} + M_{\text{maintenance}}
+\end{equation}
+
+An asset is classified as **Loan Solvent** over financing term $T$ if net operating revenue exceeds debt service obligations:
+\begin{equation}
+    \sum_{d=1}^{365} \Big( \text{Revenue}_a(d) - \big( C_{\text{ops}}(a) \times \Delta H(d) \big) \Big) > \frac{C_{\text{loan\_annual}}}{T}
+\end{equation}
+
+Weather disruptions (e.g., rainy season downpours) reduce working days. Let $N_{\text{total}}$ be total days in month $m$, and $R(m)$ be expected rain stoppage days. Effective daily capacity $P_{\text{eff}}$ and order delivery time $T_{\text{delivery}}$ adjust dynamically:
+\begin{equation}
+    P_{\text{eff}}(m) = P_{\text{nominal}} \times \left( 1 - \frac{R(m) + \sigma_{\text{safety}}}{N_{\text{total}}} \right), \quad T_{\text{delivery}} = \frac{Q_{\text{order}}}{P_{\text{eff}}(m)}
+\end{equation}
+
+\section{Multi-Tier Warehouse Network \& Inter-Quarry Logistics}
+
+Karry manages physical inventory through a hierarchical store architecture engineered for multi-site mining operations.
+
+\begin{figure}[htbp]
+  \centering
+  \framebox{\parbox{0.88\textwidth}{\centering
+    \vspace{0.4cm}
+    \textbf{\color{primarynavy}KARRY MULTI-WAREHOUSE LOGISTICS TOPOLOGY} \\
+    \vspace{0.3cm}
+    \small
+    \textsf{[ Central Warehouse (\textit{Magasin G\'en\'eral}) Hub ]} \\
+    $\swarrow \quad \downarrow \quad \searrow$ \\
+    \textsf{[ Quarry A Site Store ]} \quad \textsf{[ Quarry B Site Store ]} \quad \textsf{[ Central Workshop ]} \\
+    \vspace{0.3cm}
+    $\downarrow$ \\
+    \textsf{[ Complete Transfer Audit Trail: Lifetime Telemetry, Fuel Logs, Amortization History ]}
+    \vspace{0.4cm}
+  }}
+  \caption{Central warehouse distribution and inter-quarry transfer tracking architecture.}
+  \label{fig:warehouse_topology}
+\end{figure}
+
+\subsection{Central Warehouse (\textit{Magasin G\'en\'eral}) Network}
+\begin{itemize}
+    \item \textbf{Master Inventory Hub}: The \textit{Magasin G\'en\'eral} acts as the primary procurement center, holding high-value spare parts, crusher liners, lubricants, and secondary equipment.
+    \item \textbf{Inter-Site Dispatching}: Material dispatches to satellite quarry stores generate digital transfer waybills with automated metric tracking.
+\end{itemize}
+
+\subsection{Inter-Quarry Transfer \& Lifetime Telemetry Retention}
+When spare equipment, attachments, or heavy machinery transfer from Warehouse 1 to Warehouse 2:
+\begin{enumerate}
+    \item \textbf{Metric Clone \& Transfer}: The asset carryover file includes complete historical operating data (accumulated hours/KM, maintenance history, fuel consumption average, accrued depreciation).
+    \item \textbf{Continuous Lifetime History}: If the asset returns to Warehouse 1 or moves to a third site, Karry maintains an uninterrupted lifetime timeline of site-specific operating metrics, usage dates, and localized costs.
+\end{enumerate}
+
+\subsection{Semi-Annual \& Annual Physical Inventory Audits}
+To prevent inventory shrinkage and theft, Karry enforces mandatory physical stock checks (every 6 or 12 months):
+\begin{equation}
+    \Delta \text{Stock} = \text{Stock}_{\text{physical}} - \left( \text{Stock}_{\text{initial}} + \text{Receipts} - \text{Issues} \right)
+\end{equation}
+Any variance $\Delta \text{Stock} \neq 0$ triggers an automated internal audit flag identifying responsible store officers.
+
+\section{Field Verification Pipeline, Controller Approvals \& Native PKI Signatures}
+
+To eliminate field-level corruption and data falsification, Karry establishes a strict data governance framework.
+
+\begin{figure}[htbp]
+  \centering
+  \framebox{\parbox{0.88\textwidth}{\centering
+    \vspace{0.4cm}
+    \textbf{\color{primarynavy}TWO-TIER DATA APPROVAL PIPELINE} \\
+    \vspace{0.3cm}
+    \small
+    \textsf{[ Field Operator PWA Entry ]} $\longrightarrow$ \textsf{[ Status: Pending Controller Review ]} \\
+    $\downarrow$ \\
+    \textsf{[ Shift Controller Audit (Approve / Reject / Modify) ]} \\
+    $\downarrow$ \\
+    \textsf{[ Immutable Audit Log: Controller ID, Original Value, Modified Value, Timestamp ]}
+    \vspace{0.4cm}
+  }}
+  \caption{Two-tier field verification pipeline enforcing shift controller accountability.}
+  \label{fig:approval_pipeline}
+\end{figure}
+
+\subsection{Two-Tier Submission \& Controller Approval Workflow}
+Field inputs (meter readings, diesel re-fueling, shift hours, scale tickets) follow a mandatory verification cycle:
+\begin{enumerate}
+    \item \textbf{Field Entry}: Operator logs shift metrics via PWA. The entry enters a \textbf{Pending Approval} queue.
+    \item \textbf{Shift Controller Review}: A designated controller verifies entry validity. The controller can approve, reject, or correct entries.
+    \item \textbf{Audit Override Trail}: If a controller modifies an entry (e.g., correcting an inaccurate hour meter reading), Karry logs the controller's identity, timestamp, original value, and modified value in an immutable audit table.
+\end{enumerate}
+
+\subsection{Dual-Shift Inter-Shift Validation Protocol ($\Delta H$ Verification)}
+Operators log machine metrics at shift changeovers (Day Shift / Night Shift):
+\begin{itemize}
+    \item \textbf{Shift Start}: Operator logs machine ID, photo timestamp, fuel gauge level, and initial meter $H_{\text{start}}$.
+    \item \textbf{Shift End}: Operator logs final meter $H_{\text{end}}$. System computes $\Delta H = H_{\text{end}} - H_{\text{start}}$.
+    \item \textbf{Inter-Shift Continuity}: Night shift start meter *must* strictly equal day shift end meter ($H_{\text{start, night}} \equiv H_{\text{end, day}}$). Any mismatch triggers an instant fraud flag on the executive dashboard.
+\end{itemize}
+
+\subsection{Native PKI Electronic Signature Module}
+Karry eliminates paper-based signing, scanning, and emailing. All formal shift handovers, weighbridge tickets, transfer waybills, and controller approvals embed a native **Electronic Signature Capture**:
+\begin{itemize}
+    \item \textbf{Touchscreen Canvas Capture}: On-device signature drawing stored as cryptographic vector data.
+    \item \textbf{PKI Digital Hash}: Signatures are combined with user credentials, GPS coordinates, and payload SHA-256 hashes, producing tamper-evident digital certificates.
+\end{itemize}
+
+\subsection{Weighbridge Scale Ticket Security}
+Digital scale tickets produce immutable ledger records containing net payload weight, truck registration, timestamp, and weighmaster digital signature. Scale tickets cannot be edited manually; corrections require counter-signed reversal entries.
+
+\subsection{Granular Role-Based Access Control (RBAC)}
+System administrators maintain absolute authority over field-level data visibility. Administrators can configure custom Read, Write, and Masked permissions per role (e.g., hiding financial margins from field operators while permitting hour meter entries).
+
+\section{Executive AI / LLM Intelligence and Natural Language Layer}
+
+Karry includes an **Executive AI Copilot Engine** that converts site telemetry, wear vectors, warehouse transfers, and financial metrics into actionable insights.
+
+\begin{figure}[htbp]
+  \centering
+  \framebox{\parbox{0.88\textwidth}{\centering
+    \vspace{0.4cm}
+    \textbf{\color{primarynavy}EXECUTIVE AI COPILOT ENGINE FLOW} \\
+    \vspace{0.3cm}
+    \small
+    \textsf{[ Site Telemetry \& Shifts ]} $+$ \textsf{[ Wear RUL Vectors ]} $+$ \textsf{[ Financial Ledger ]} \\
+    $\downarrow$ \\
+    \textsf{[ Context Assembler \& Prompt Sanitizer ]} \\
+    $\downarrow$ \\
+    \textsf{[ LLM Reasoning Engine (Semantic Kernel / OpenAI / Llama) ]} \\
+    $\downarrow$ \\
+    \textsf{[ Executive Summaries, Anomaly Alerts \& Natural Language Q\&A ]}
+    \vspace{0.4cm}
+  }}
+  \caption{Augmented Intelligence RAG flow transforming raw data into business decisions.}
+  \label{fig:ai_flow}
+\end{figure}
+
+\subsection{Core AI Capabilities}
+\begin{enumerate}
+    \item \textbf{Natural Language Site Querying}: Executives ask questions in English or French (e.g., \textit{"Did Loader CAT-966 generate sufficient net margin to cover its monthly bank loan?"} or \textit{"Which warehouse transferred jaw plates to Site B last month?"}).
+    \item \textbf{Automated Fuel Theft Detection}: Cross-analyzes fuel dispatches against engine delta metrics ($\Delta H / \Delta K$) and crushed output tonnage. Fuel consumption spikes $+18\%$ above baseline trigger instant fraud alerts.
+    \item \textbf{Dynamic Maintenance Grouping}: Analyzes component $RUL$ vectors across all machinery to group maintenance events into single plant stops.
+    \item \textbf{Conveyor Belt Bottleneck Analysis}: Monitors $Q_{\text{belt}}(t)$ speeds to alert managers when wet weather or belt wear reduces plant throughput.
+    \item \textbf{Sales Contract Weather Advisory}: Alerts commercial managers when accepting large aggregate orders risks delivery delays due to forecasted rainfall $R(m)$.
+\end{enumerate}
+
+\section{Visual Intelligence, Metric Dashboards, and Interactive Analytics Engine}
+
+Karry features an interactive visual analytics suite (\textit{tableaux de bord interactifs avec les courbes et graphiques}).
+
+\begin{figure}[htbp]
+  \centering
+  \framebox{\parbox{0.92\textwidth}{\centering
+    \vspace{0.5cm}
+    \textbf{\color{primarynavy}EXECUTIVE DASHBOARD VISUALIZATION ARCHITECTURE} \\
+    \vspace{0.3cm}
+    \small
+    \textsf{[ Real-Time Tonnage \& Rate Curves ($\dot{m}(t)$) ]} \quad
+    \textsf{[ Wear Decay Trajectory Curves ($RUL_{\text{days}}$) ]} \\
+    \vspace{0.2cm}
+    \textsf{[ Fuel Anomaly Spike Heatmaps ]} \quad
+    \textsf{[ Net Revenue vs. Loan Repayment Visual Lines ]} \\
+    \vspace{0.3cm}
+    $\downarrow$ \\
+    \textsf{[ Responsive Interactive Chart Layer (Recharts / Canvas API) ]} \\
+    $\downarrow$ \\
+    \textsf{[ Role-Tailored Views: Site Tablet UI / Shift Controller / Executive Portal ]}
+    \vspace{0.5cm}
+  }}
+  \caption{Visual analytics layer rendering live telemetry and mathematical projections into actionable curves.}
+  \label{fig:dashboard_vis}
+\end{figure}
+
+\subsection{Key Graphical Dashboard Views (\textit{Les Courbes et Graphiques})}
+\begin{enumerate}
+    \item \textbf{Production \& Conveyor Speed Curves ($Q_{\text{belt}}(t)$ \& $\dot{m}(t)$ Graphs)}: Real-time time-series lines displaying mass flow rates, conveyor speeds, and screen recirculation bottlenecks.
+    \item \textbf{Wear Decay Trajectory Curves ($RUL$ Mapping)}: Degradation trendlines mapping remaining useful life across hours, kilometers, or calendar days, highlighting order thresholds ($\tau_{\text{buffer}}$).
+    \item \textbf{Fuel Efficiency Scatter Curves}: Scatter plots comparing fuel consumption rates against tonnage extracted, highlighting anomaly points ($+18\%$) in red.
+    \item \textbf{Financial Loan Amortization Lines}: Visual curves comparing net asset revenue against linear bank financing repayment curves, with shaded rain disruption overlays $R(m)$.
+\end{enumerate}
+
+\subsection{Mobile PWA Visual Ergonomics}
+All charts are built with responsive vector graphics (SVG/Canvas), ensuring instant rendering on low-cost Android field tablets as well as high-resolution executive desktop screens. Touch-optimized tooltips allow field staff to inspect individual data points on site.
+
+\section{Technology Stack and System Architecture}
+
+\subsection{Layered Technology Specifications}
+
+\begin{table}[htbp]
+\centering
+\caption{Karry Enterprise Technology Stack}
+\vspace{0.2cm}
+\begin{tabular}{lll}
+\toprule
+\textbf{Layer} & \textbf{Selected Technology} & \textbf{Architectural Purpose} \\
+\midrule
+\textbf{Frontend PWA} & React (TypeScript) + Tailwind & Offline-first PWA, touch e-signatures, dynamic unit toggle. \\
+\textbf{Visual Engine} & Recharts / Canvas API & Interactive production curves, wear decay graphs, heatmaps. \\
+\textbf{Client Storage} & IndexedDB / Dexie.js & Offline shift queues, local scale tickets, pending entries. \\
+\textbf{Backend API} & .NET 9 Core (C\#) & High-throughput REST API, Entity Framework Core 9 ORM. \\
+\textbf{Database Engine} & PostgreSQL 16 + PostGIS & Relational database, spatial blast grid mapping, Row-Level Security. \\
+\textbf{Digital Signatures} & PKI SHA-256 + Canvas API & Tamper-evident electronic signatures for reports and approvals. \\
+\textbf{Math \& Graph Engine} & Python (FastAPI + NumPy) & Dynamic conveyor speed modeling, $RUL$ graph computations. \\
+\textbf{AI Layer} & Semantic Kernel / Python LLM & Contextual executive RAG, anomaly alerts, natural language Q\&A. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Offline-First Web PWA Strategy}
+Karry uses a Progressive Web App (PWA) architecture to maintain continuous operation during network outages at isolated site quarries:
+\begin{itemize}
+    \item \textbf{Service Workers}: Caches application assets for instant startup without cellular coverage.
+    \item \textbf{Background Sync}: Holds offline entries in IndexedDB and automatically syncs data once 4G/Wi-Fi connection is restored.
+\end{itemize}
+
+\subsection{Multi-Tenant SaaS Security \& i18n}
+PostgreSQL Row-Level Security (RLS) enforces tenant data boundaries:
+\begin{center}
+\small\texttt{CREATE POLICY tenant\_isolation\_policy ON table\_name USING (tenant\_id = current\_setting('app.current\_tenant\_id'));}
+\end{center}
+Karry includes built-in dynamic unit converters ($m^3 \leftrightarrow \text{Tonnes}$, Short Tons $\leftrightarrow$ Metric Tonnes), multi-currency financial engines (USD, EUR, XOF, CAD), and instant English/French language toggling.
+
+\section{8-Week Implementation Roadmap}
+
+\begin{table}[htbp]
+\centering
+\caption{Karry MVP Development Schedule (8 Weeks)}
+\vspace{0.2cm}
+\begin{tabular}{cll}
+\toprule
+\textbf{Week} & \textbf{Focus Area} & \textbf{Key Deliverables} \\
+\midrule
+\textbf{W1--W2} & Core Setup \& RBAC & .NET 9 API, PostgreSQL schema, granular RBAC, unit toggle API. \\
+\textbf{W3--W4} & PWA \& Verification & Mobile PWA forms, controller approval pipeline, PKI e-signatures. \\
+\textbf{W5--W6} & Maintenance \& Stores & Hybrid $RUL$ (Hours/KM/Days), \textit{Magasin G\'en\'eral}, inter-site transfers. \\
+\textbf{W7--W8} & Analytics, Curves \& AI & Visual dashboards (\textit{courbes}), loan amortization, AI copilot layer. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Conclusion}
+\noindent
+**Karry** (\textit{Application pour la Gestion de Carri\`ere}) delivers a comprehensive operational management system tailored for civil engineering extractions, aggregate quarries, sand washing plants, and open-pit mining operations. By integrating dynamic volumetric toggles, conveyor belt performance physics, closed-loop processing graph mathematics, hybrid predictive maintenance metrics, multi-warehouse transfer tracking (\textit{Magasin G\'en\'eral}), two-tier controller approval workflows, native PKI electronic signatures, interactive visual analytics curves, and executive AI intelligence, Karry eliminates field corruption while delivering a globally commercializable SaaS product.
+
+\end{document}

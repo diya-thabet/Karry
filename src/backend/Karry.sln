@@ -1,0 +1,54 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34330.188
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Karry.Domain", "Karry.Domain\Karry.Domain.csproj", "{77D0BFD7-8F70-4EC2-9B15-4F9F2A267FE4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Karry.Application", "Karry.Application\Karry.Application.csproj", "{88315030-2494-488A-B133-A25630E1C93D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Karry.Infrastructure", "Karry.Infrastructure\Karry.Infrastructure.csproj", "{86301DD5-9596-44E2-B165-178EE99D7262}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Karry.Api", "Karry.Api\Karry.Api.csproj", "{BF0B438A-79B2-465E-AED4-1E4E521A1B9D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Karry.MathEngine.Client", "Karry.MathEngine.Client\Karry.MathEngine.Client.csproj", "{4D2062C5-057E-410E-9486-0074BA8862CB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Karry.Tests", "Karry.Tests\Karry.Tests.csproj", "{39D5756C-8F20-455F-A37D-3C4CA20C8536}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{77D0BFD7-8F70-4EC2-9B15-4F9F2A267FE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77D0BFD7-8F70-4EC2-9B15-4F9F2A267FE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77D0BFD7-8F70-4EC2-9B15-4F9F2A267FE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77D0BFD7-8F70-4EC2-9B15-4F9F2A267FE4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88315030-2494-488A-B133-A25630E1C93D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88315030-2494-488A-B133-A25630E1C93D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88315030-2494-488A-B133-A25630E1C93D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88315030-2494-488A-B133-A25630E1C93D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86301DD5-9596-44E2-B165-178EE99D7262}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86301DD5-9596-44E2-B165-178EE99D7262}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86301DD5-9596-44E2-B165-178EE99D7262}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86301DD5-9596-44E2-B165-178EE99D7262}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF0B438A-79B2-465E-AED4-1E4E521A1B9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF0B438A-79B2-465E-AED4-1E4E521A1B9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF0B438A-79B2-465E-AED4-1E4E521A1B9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF0B438A-79B2-465E-AED4-1E4E521A1B9D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D2062C5-057E-410E-9486-0074BA8862CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D2062C5-057E-410E-9486-0074BA8862CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D2062C5-057E-410E-9486-0074BA8862CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D2062C5-057E-410E-9486-0074BA8862CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39D5756C-8F20-455F-A37D-3C4CA20C8536}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39D5756C-8F20-455F-A37D-3C4CA20C8536}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39D5756C-8F20-455F-A37D-3C4CA20C8536}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39D5756C-8F20-455F-A37D-3C4CA20C8536}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F2A3C4D5-E6F7-8A9B-0C1D-2E3F4A5B6C7D}
+	EndGlobalSection
+EndGlobal

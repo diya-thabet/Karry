@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Karry.Domain</RootNamespace>
+    <AssemblyName>Karry.Domain</AssemblyName>
+  </PropertyGroup>
+
+</Project>
