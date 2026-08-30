@@ -9,15 +9,16 @@
 | Endpoint | Method | Auth | Purpose |
 |---|---|---|---|
 | `/api/auth/login` | POST | – | Email + password login (may return 2FA challenge) |
-| `/api/auth/two-factor/login` | POST | – | Complete 2FA challenge → tokens |
+| `/api/auth/two-factor/login` | POST | – | Complete 2FA → tokens — body `{ email, code, deviceId }` |
 | `/api/auth/refresh` | POST | – | Rotate refresh token (reuse detection) |
 | `/api/auth/logout` | POST | JWT | Revoke refresh token (idempotent) |
-| `/api/auth/two-factor/enable` · `/verify` · `/disable` | POST | JWT | 2FA enrolment/verification |
+| `/api/auth/two-factor/enable` · `/verify` · `/disable` | POST | JWT | 2FA enrolment/verification (enable → `{ secret, provisioningUri }`) |
+| `/api/auth/me` | GET | JWT | Current session context: user, `tenantId`, `roleCode`, `isPlatformAdmin`, `permissions`, `twoFactorEnabled` |
 | `/api/tenants` | POST | JWT (platform admin) | Create tenant (seeds roles + admin + unit prefs) |
 | `/api/users` | GET/POST | JWT | List / create tenant users |
 | `/api/roles` | GET/POST | JWT | List / create roles (GET returns operator role id) |
 | `/api/units/convert` | POST | JWT | Dynamic m³ ↔ Tonnes conversion |
-| `/api/units/preferences` | PUT/POST | JWT | Per-user unit preference |
+| `/api/units/preferences` | PUT/POST | JWT | Per-user unit preference (PUT → 204) |
 | `/swagger` | GET | – | Swagger UI |
 
 ## `POST /api/units/convert`

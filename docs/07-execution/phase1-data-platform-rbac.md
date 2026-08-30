@@ -1,6 +1,6 @@
 # Phase 1 — Data Platform & RBAC (In Progress)
 
-> **Status:** ✅ Substantially complete · **Goal:** Secure multi-tenant auth + RBAC, dynamic unit toggle with per-tenant/per-user unit preferences + audit, and a frontend login shell.
+> **Status:** ✅ Complete · **Goal:** Secure multi-tenant auth + RBAC, dynamic unit toggle with per-tenant/per-user unit preferences + audit, and a relational admin shell.
 > **Canonical spec:** [`../02-reference/codex.tex`](../02-reference/codex.tex) · **Full plan:** [`../01-planning/IMPLEMENTATION_PLAN.md`](../01-planning/IMPLEMENTATION_PLAN.md)
 > **Backend design:** [`../03-backend/01-architecture.md`](../03-backend/01-architecture.md) · **DB/RLS:** [`../03-backend/04-database.md`](../03-backend/04-database.md) · **Frontend:** [`../04-frontend/01-architecture.md`](../04-frontend/01-architecture.md)
 
@@ -58,14 +58,21 @@
 
 - New **`integration`** job: spins up a `postgres:16` service container, sets `Database__AutoMigrate=true` + `Seed__Enabled=true` + `Seed__AdminPassword`, builds and runs `Karry.IntegrationTests.sln`, uploads TRX results.
 
-### 1.7 Frontend login shell (`src/frontend`)
+### 1.7 Frontend (admin shell — `src/frontend`)
 
-- `lib/http.ts` — fetch wrapper: Bearer injection, `Idempotency-Key` header for mutating calls, `ApiError` + RFC-7807 problem parsing.
-- `features/auth/` — `types.ts`, `api.ts` (login/two-factor/refresh/logout, device-id), `authStore.ts` (zustand + `persist`), `tokenManager.ts` (single-flight refresh + reuse-detection logout), `guards.tsx` (`RequireAuth` / `GuestOnly`), `LoginPage.tsx` (email/password + 2FA step).
-- `router.tsx` — `/login` guest route; app shell wrapped in `RequireAuth` (redirects to `/login` with `from` back-link).
-- `AppShell.tsx` — signed-in user + role + sign-out button.
-- `lib/api.ts` `convertMeasure` now goes through `getAccessToken()` + idempotency.
-- `lib/http.test.ts` — idempotency-key + problem-parsing unit tests. 8 frontend tests green.
+A senior-grade, scalable React 18 + Vite + Tailwind + Zustand admin shell was built:
+
+- **Design system** (`components/ui/`): theme tokens in `tailwind.config.js` (full `primary`/`accent` scales, `surface`/`ink`/semantic `success`/`danger`/`warning`), plus reusable primitives — `Button` (variants/sizes/loading), `Input`, `Select`, `Field`, `Card`, `Badge`, `Avatar`, `Spinner`, `Modal`, `Alert`, `Table`, `EmptyState`, `PageHeader`. Shared `cn()`, `initials()`, `format()` helpers.
+- **Transport** (`lib/http.ts`): `fetch` wrapper with Bearer injection, `Idempotency-Key` header for mutating calls, and RFC-7807 `ApiError` parsing.
+- **Typed API layer** (`lib/api/`): `auth`, `tenants`, `users`, `roles`, `units` endpoint groups (all take an explicit `accessToken` → pure/testable, no `lib→features` coupling).
+- **Auth core** (`features/auth/`): zustand+`persist` store holding full session (tokens + user + tenant + role + permissions); `useAuth` hook with `refreshSession()` (calls `GET /api/auth/me`); single-flight `tokenManager` with reuse-detection logout; `LoginPage` with a proper 2FA step (fixed contract: sends `email` + `code` + `deviceId`); `RequireAuth` / `GuestOnly` / `RequirePermission` guards.
+- **Screens**: Users (table + create modal w/ role select), Roles (list + create), Unit Preferences (per-user picker → `PUT /api/units/preferences`), Tenants (platform-admin provisioning), Security (2FA enable/verify/disable + session detail), polished Dashboard and login.
+- **Layout**: responsive `AppShell` with sidebar nav (Mobile drawer), RBAC-filtered nav, signed-in user + sign-out.
+- **Tests**: 20 frontend unit tests (convert, http/idempotency, preferences, permissions, initials). All gates green: typecheck / lint / format / test / build.
+
+### 1.8 Backend session endpoint
+
+- `GET /api/auth/me` — returns the current session context (`userId`, `email`, `name`, `tenantId`, `roleCode`, `isPlatformAdmin`, `twoFactorEnabled`, `permissions`) so the frontend is RBAC-aware. Implemented via `GetCurrentSessionQuery` (+ 3 unit tests; 108 backend tests total).
 
 ---
 
@@ -85,14 +92,14 @@ Covered end-to-end by `MilestoneFlowTests` against real Postgres in CI.
 | Check | Command | Result |
 |---|---|---|
 | Backend build | `dotnet build Karry.sln` (local) | 0 warnings, 0 errors |
-| Backend tests | `dotnet test Karry.sln --no-build` | 105 passed / 0 failed |
+| Backend tests | `dotnet test Karry.sln --no-build` | 108 passed / 0 failed |
 | Integration build (no PG needed) | `dotnet build Karry.IntegrationTests.sln` | 0 warnings, 0 errors |
 | Frontend typecheck | `npm run typecheck` | pass |
 | Frontend lint | `npm run lint` | pass |
 | Frontend format | `npm run format:check` | pass |
-| Frontend tests | `npm test` | 8 passed |
+| Frontend tests | `npm test` | 20 passed |
 | Frontend build (PWA) | `npm run build` | pass |
-| CI integration job | (Postgres service container) | runs only in CI |
+| Backend session context | `GET /api/auth/me` (+ `GetCurrentSessionQuery` tests) | role/tenant/permissions surfaced |
 
 > The real-Postgres integration tests execute **only in CI** (no Docker/Postgres on the authoring machine). Local Application tests are DB-independent by design.
 
@@ -100,7 +107,7 @@ Covered end-to-end by `MilestoneFlowTests` against real Postgres in CI.
 
 ## 4. In scope / out of scope
 
-- **In scope:** identity/tenancy/RBAC, unit preferences + audit, existing `machines`/`wear_parts` RLS, integration tests, frontend login shell.
+- **In scope:** identity/tenancy/RBAC, unit preferences + audit, existing `machines`/`wear_parts` RLS, integration tests, full admin frontend (users/roles/tenants/units/2FA/dashboard + session-aware RBAC).
 - **Out of scope (Phase 2+):** site/blast, shifts, warehouse, financial, PKI, weather entities — no domain entities yet, so no migration rows.
 
 ---
@@ -114,8 +121,8 @@ Covered end-to-end by `MilestoneFlowTests` against real Postgres in CI.
 
 ---
 
-## 6. Hand-off to remainder of Phase 1 / Phase 2
+## 6. Hand-off to Phase 2
 
-- Frontend: tenant-management screens (create tenant/users/roles), per-user unit-preference picker wired to `PUT /api/units/preferences`, 2FA enrollment UI, route guard per role.
-- Swagger/OpenAPI niceties + API docs refresh in `03-backend/03-api.md`.
+- Phase 1 frontend (users, roles, tenant provisioning, per-user unit preferences, 2FA, dashboard) is **complete and covered by 20 unit tests**; all five frontend gates and 108 backend tests are green.
+- Swagger/OpenAPI niceties + API docs refresh in `03-backend/03-api.md` (add `GET /api/auth/me`).
 - Phase 2 entities (site/blast, shifts, warehouse, financial, PKI, weather) + their migrations, warehouse/site RLS.
