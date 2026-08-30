@@ -1,17 +1,14 @@
 import { httpRequest } from '@/lib/http';
+import { toCreateUserBody } from './contracts';
+import type { CreateUserBody } from './contracts';
 import type { User } from '@/features/auth/types';
-
-export interface CreateUserRequest {
-  email: string;
-  name: string;
-  password: string;
-  roleId: string;
-}
 
 export interface CreateUserResponse {
   userId: string;
   email: string;
 }
+
+export type CreateUserRequest = CreateUserBody;
 
 export function listUsers(accessToken: string): Promise<User[]> {
   return httpRequest<User[]>('/users', {
@@ -26,7 +23,7 @@ export function createUser(
 ): Promise<CreateUserResponse> {
   return httpRequest<CreateUserResponse>('/users', {
     method: 'POST',
-    json: request,
+    json: toCreateUserBody(request),
     token: accessToken,
     idempotent: true,
     idempotencyKey: `user:${request.email.trim().toLowerCase()}`,

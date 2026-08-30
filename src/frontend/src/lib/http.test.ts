@@ -31,4 +31,30 @@ describe('parseProblem', () => {
     expect(parseProblem('just text')).toEqual({ title: null, detail: null, code: null });
     expect(parseProblem(null)).toEqual({ title: null, detail: null, code: null });
   });
+
+  it('handles partial problem objects', () => {
+    expect(parseProblem({ title: 'Error' })).toEqual({ title: 'Error', detail: null, code: null });
+    expect(parseProblem({ detail: 'Something went wrong' })).toEqual({
+      title: null,
+      detail: 'Something went wrong',
+      code: null,
+    });
+    expect(parseProblem({ code: 'TIMEOUT' })).toEqual({
+      title: null,
+      detail: null,
+      code: 'TIMEOUT',
+    });
+  });
+
+  it('ignores non-string values in problem fields', () => {
+    expect(parseProblem({ title: 42, detail: true, code: ['x'] })).toEqual({
+      title: null,
+      detail: null,
+      code: null,
+    });
+  });
+
+  it('returns nulls for empty objects', () => {
+    expect(parseProblem({})).toEqual({ title: null, detail: null, code: null });
+  });
 });

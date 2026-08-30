@@ -24,4 +24,14 @@ describe('can', () => {
   it('handles empty claim sets', () => {
     expect(can([], 'users:read')).toBe(false);
   });
+
+  it('matches exact string length with colons', () => {
+    expect(can(['a:b'], 'a:b')).toBe(true);
+    expect(can(['a:b '], 'a:b')).toBe(false);
+  });
+
+  it('is case-sensitive about action part', () => {
+    expect(can(['users:Read'], 'users:read')).toBe(false);
+    expect(can(['users:write'], 'users:Write')).toBe(false);
+  });
 });

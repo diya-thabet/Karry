@@ -1,4 +1,12 @@
 import { httpRequest } from '@/lib/http';
+import {
+  toEnableTwoFactorBody,
+  toLoginBody,
+  toLogoutBody,
+  toRefreshBody,
+  toTwoFactorLoginBody,
+  toVerifyTwoFactorBody,
+} from './contracts';
 import type {
   CurrentSession,
   EnableTwoFactorResponse,
@@ -30,7 +38,7 @@ export function getDeviceId(): string {
 export function login(request: LoginRequest): Promise<LoginResponse> {
   return httpRequest<LoginResponse>('/auth/login', {
     method: 'POST',
-    json: request,
+    json: toLoginBody(request.email, request.password, request.deviceId),
     idempotent: true,
     idempotencyKey: `login:${request.email.toLowerCase()}`,
   });
@@ -39,7 +47,7 @@ export function login(request: LoginRequest): Promise<LoginResponse> {
 export function twoFactorLogin(request: TwoFactorLoginRequest): Promise<LoginResponse> {
   return httpRequest<LoginResponse>('/auth/two-factor/login', {
     method: 'POST',
-    json: request,
+    json: toTwoFactorLoginBody(request.email, request.code, request.deviceId),
     idempotent: true,
   });
 }
@@ -47,7 +55,7 @@ export function twoFactorLogin(request: TwoFactorLoginRequest): Promise<LoginRes
 export function refresh(refreshToken: string): Promise<RefreshResponse> {
   return httpRequest<RefreshResponse>('/auth/refresh', {
     method: 'POST',
-    json: { refreshToken, deviceId: getDeviceId() },
+    json: toRefreshBody(refreshToken, getDeviceId()),
     idempotent: true,
     idempotencyKey: `refresh:${refreshToken}`,
   });
@@ -56,7 +64,7 @@ export function refresh(refreshToken: string): Promise<RefreshResponse> {
 export function logout(refreshToken: string, accessToken: string): Promise<void> {
   return httpRequest<void>('/auth/logout', {
     method: 'POST',
-    json: { refreshToken },
+    json: toLogoutBody(refreshToken),
     token: accessToken,
     idempotent: true,
     idempotencyKey: `logout:${refreshToken}`,
@@ -73,7 +81,7 @@ export function getCurrentSession(accessToken: string): Promise<CurrentSession> 
 export function enableTwoFactor(accessToken: string): Promise<EnableTwoFactorResponse> {
   return httpRequest<EnableTwoFactorResponse>('/auth/two-factor/enable', {
     method: 'POST',
-    json: { deviceId: getDeviceId() },
+    json: toEnableTwoFactorBody(getDeviceId()),
     token: accessToken,
     idempotent: true,
   });
@@ -82,7 +90,7 @@ export function enableTwoFactor(accessToken: string): Promise<EnableTwoFactorRes
 export function verifyTwoFactor(accessToken: string, secret: string, code: string): Promise<void> {
   return httpRequest<void>('/auth/two-factor/verify', {
     method: 'POST',
-    json: { secret, code },
+    json: toVerifyTwoFactorBody(secret, code),
     token: accessToken,
     idempotent: true,
   });

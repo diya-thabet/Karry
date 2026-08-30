@@ -19,7 +19,7 @@ body {
 
 @layer base {
   * {
-    @apply border-ink/10;
+    @apply border-slate-900/10;
   }
 }
 
@@ -29,6 +29,6 @@ body {
   }
 
   .card-surface {
-    @apply rounded-xl border border-ink/10 bg-white shadow-card;
+    @apply rounded-xl border border-slate-900/10 bg-white shadow-card;
   }
 }

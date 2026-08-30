@@ -1,20 +1,13 @@
 import { httpRequest } from '@/lib/http';
-
-export interface CreateTenantRequest {
-  name: string;
-  country: string;
-  currency: string;
-  timezone?: string;
-  locale?: string;
-  adminEmail?: string;
-  adminPassword?: string;
-  adminName?: string;
-}
+import { toCreateTenantBody } from './contracts';
+import type { CreateTenantBody } from './contracts';
 
 export interface CreateTenantResponse {
   tenantId: string;
   name: string;
 }
+
+export type CreateTenantRequest = CreateTenantBody;
 
 export function createTenant(
   accessToken: string,
@@ -22,7 +15,7 @@ export function createTenant(
 ): Promise<CreateTenantResponse> {
   return httpRequest<CreateTenantResponse>('/tenants', {
     method: 'POST',
-    json: request,
+    json: toCreateTenantBody(request),
     token: accessToken,
     idempotent: true,
     idempotencyKey: `tenant:${request.name.trim().toLowerCase()}`,

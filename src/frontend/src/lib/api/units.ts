@@ -1,4 +1,5 @@
 import { httpRequest } from '@/lib/http';
+import { toSetUnitPreferencesBody } from './contracts';
 
 export interface ConvertMeasureRequest {
   value: number;
@@ -37,7 +38,7 @@ export function setUnitPreferences(
 ): Promise<void> {
   return httpRequest<void>('/units/preferences', {
     method: 'PUT',
-    json: request,
+    json: toSetUnitPreferencesBody(request),
     token: accessToken,
     idempotent: true,
   });
