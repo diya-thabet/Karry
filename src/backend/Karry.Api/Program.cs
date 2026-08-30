@@ -1,7 +1,9 @@
 using System.Text;
 using Karry.Api;
 using Karry.Api.Middleware;
+using Karry.Api.Security;
 using Karry.Application;
+using Karry.Application.Security;
 using Karry.Domain.Common;
 using Karry.Infrastructure;
 using Karry.MathEngine.Client;
@@ -20,6 +22,9 @@ builder.Host.UseSerilog((context, config) => config
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddMathEngineClient(builder.Configuration);
+
+builder.Services.AddSingleton<IAccessTokenService>(sp =>
+    new AccessTokenService(builder.Configuration));
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

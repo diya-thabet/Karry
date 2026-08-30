@@ -1,7 +1,10 @@
+using Karry.Domain.Audit;
 using Karry.Domain.Common;
 using Karry.Domain.Equipment;
+using Karry.Domain.Identity;
 using Karry.Domain.Maintenance;
 using Karry.Domain.Tenants;
+using Karry.Domain.Units;
 using Microsoft.EntityFrameworkCore;
 
 namespace Karry.Infrastructure.Persistence;
@@ -17,6 +20,20 @@ public class KarryDbContext : DbContext, IUnitOfWork
     }
 
     public DbSet<Tenant> Tenants => Set<Tenant>();
+
+    public DbSet<User> Users => Set<User>();
+
+    public DbSet<Role> Roles => Set<Role>();
+
+    public DbSet<Permission> Permissions => Set<Permission>();
+
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+
+    public DbSet<TenantUnitPreference> TenantUnitPreferences => Set<TenantUnitPreference>();
+
+    public DbSet<UserUnitPreference> UserUnitPreferences => Set<UserUnitPreference>();
+
+    public DbSet<AuditLogEntry> AuditLogEntries => Set<AuditLogEntry>();
 
     public DbSet<Machine> Machines => Set<Machine>();
 

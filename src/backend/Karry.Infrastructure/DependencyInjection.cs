@@ -1,7 +1,12 @@
+using Karry.Application.Auth;
+using Karry.Application.Common;
+using Karry.Application.Security;
 using Karry.Domain.Common;
+using Karry.Infrastructure.Auth;
 using Karry.Infrastructure.Context;
 using Karry.Infrastructure.Persistence;
 using Karry.Infrastructure.Persistence.Repositories;
+using Karry.Infrastructure.Security;
 using Karry.Application;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -20,14 +25,25 @@ public static class DependencyInjection
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentTenant>(sp => sp.GetRequiredService<TenantContext>());
         services.AddScoped<ICurrentUser>(sp => sp.GetRequiredService<TenantContext>());
+        services.AddScoped<ICurrentSession>(sp => sp.GetRequiredService<CurrentSessionProvider>());
         services.AddScoped<TenantContext>();
+        services.AddScoped<CurrentSessionProvider>();
 
-        services.AddDbContext<KarryDbContext>(options =>
-            options.UseNpgsql(connectionString, npgsql =>
-                npgsql.UseNetTopologySuite()));
+        services.AddDbContext<KarryDbContext>((sp, options) =>
+            options
+                .UseNpgsql(connectionString, npgsql =>
+                    npgsql.UseNetTopologySuite())
+                .AddInterceptors(sp.GetRequiredService<RowLevelSecurityInterceptor>()));
 
+        services.AddScoped<RowLevelSecurityInterceptor>();
         services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<KarryDbContext>());
+
+        services.AddScoped<IClock, SystemClock>();
+        services.AddScoped<ISecureRandom, SecureRandom>();
+        services.AddScoped<IPasswordHasher, PasswordHasher>();
+        services.AddScoped<ITotpService, TotpService>();
+        services.AddScoped<ITokenIssuer, TokenIssuer>();
 
         services.AddStackExchangeRedisCache(options =>
         {
@@ -36,4 +52,9 @@ public static class DependencyInjection
 
         return services;
     }
+}
+
+internal sealed class SystemClock : IClock
+{
+    public DateTime UtcNow => DateTime.UtcNow;
 }
