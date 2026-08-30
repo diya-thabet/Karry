@@ -2,9 +2,9 @@
 
 > **Purpose:** A living log of problems encountered while building Karry, with the exact root cause and fix — so a future LLM (or human) does **not** repeat the same mistakes.
 >
-> **Convention:** Append a new entry at the **bottom** each time you hit a non-obvious issue. Keep it precise: symptom → root cause → fix. If a fix is an architectural decision, also reflect it in [`docs/architecture.md`](architecture.md).
+> **Convention:** Append a new entry at the **bottom** each time you hit a non-obvious issue. Keep it precise: symptom → root cause → fix. If a fix is an architectural decision, also reflect it in [`../architecture.md`](../architecture.md).
 >
-> **Phase log index:** see [`phase0-foundations-tooling.md`](phase0-foundations-tooling.md) and future `phaseN-*.md` files.
+> **Phase log index:** see [`../07-execution/phase0-foundations-tooling.md`](../07-execution/phase0-foundations-tooling.md) and future `phaseN-*.md` files.
 
 ---
 
@@ -238,5 +238,5 @@ This is a **verification-only** install — do not assume it persists in a fresh
 
 1. Reproduce / hit a new problem → add an `### NNN — <summary>` entry above.
 2. Keep the three golden rules: **Symptom → Root cause → Fix**.
-3. If the fix changes architecture, update [`docs/architecture.md`](architecture.md) too.
+3. If the fix changes architecture, update [`../architecture.md`](../architecture.md) too.
 4. Reference the phase log that introduced/encountered the issue.

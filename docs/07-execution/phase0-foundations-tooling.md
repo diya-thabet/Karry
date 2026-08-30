@@ -2,7 +2,7 @@
 
 > **Status:** ✅ Complete · **Duration:** single engineering session
 > **Goal:** Reproducible dev environment, CI/CD skeleton, coding standards, and a verified build across all three service layers.
-> **Canonical spec:** [`docs/codex.tex`](codex.tex) · **Full plan:** [`docs/IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md)
+> **Canonical spec:** [`../02-reference/codex.tex`](../02-reference/codex.tex) · **Full plan:** [`../01-planning/IMPLEMENTATION_PLAN.md`](../01-planning/IMPLEMENTATION_PLAN.md)
 
 ---
 
@@ -99,7 +99,7 @@ Four jobs (run on push/PR to `main`/`develop`):
 
 | Path | Purpose |
 |---|---|
-| `docs/IMPLEMENTATION_PLAN.md` | Full phased plan (from earlier, cross-ref) |
+| `01-planning/IMPLEMENTATION_PLAN.md` | Full phased plan (from earlier, cross-ref) |
 | `.github/workflows/ci.yml` | CI pipeline |
 | `.editorconfig` | Editorial + code style standards |
 | `.env.example` | Dev environment template (secrets sample) |

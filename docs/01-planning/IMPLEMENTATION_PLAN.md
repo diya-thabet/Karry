@@ -1,7 +1,7 @@
 # Karry Platform — Master Implementation Plan & Execution Phases
 
 > **Karry** (*Application pour la Gestion de Carrière*) — Enterprise Quarry & Mining Management Operating System.
-> This document translates the technical codex (`docs/codex.tex`) into a complete, actionable, phase-by-phase engineering execution plan.
+> This document translates the technical codex (`../02-reference/codex.tex`) into a complete, actionable, phase-by-phase engineering execution plan.
 
 ---
 
@@ -613,4 +613,4 @@ A module is **done** when:
 
 ---
 
-*End of implementation plan. This document is a living artifact — update it as the build progresses and lessons are learned. All cross-references point to `docs/codex.tex` for the canonical domain specification.*
+*End of implementation plan. This document is a living artifact — update it as the build progresses and lessons are learned. All cross-references point to `../02-reference/codex.tex` for the canonical domain specification.*

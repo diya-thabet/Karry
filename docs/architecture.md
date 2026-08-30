@@ -1,7 +1,8 @@
 # Karry Platform — System Architecture
 
-> **Audience:** Any engineer or LLM joining the project. This document is the single source of truth for *how the system is structured and why*.
-> **Companions:** [`docs/codex.tex`](codex.tex) (domain/math spec) · [`docs/IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md) (phased build plan) · [`docs/llmhandsoff.md`](llmhandsoff.md) (lessons learned).
+> **Audience:** Any engineer or LLM joining the project. This is the cross-cutting architecture overview.
+> **Layer-specific docs:** [`03-backend/01-architecture.md`](03-backend/01-architecture.md) · [`04-frontend/01-architecture.md`](04-frontend/01-architecture.md) · [`05-math-engine/01-architecture.md`](05-math-engine/01-architecture.md) · [`06-infrastructure/01-architecture.md`](06-infrastructure/01-architecture.md)
+> **Companions:** [`02-reference/codex.tex`](02-reference/codex.tex) (domain/math spec) · [`01-planning/IMPLEMENTATION_PLAN.md`](01-planning/IMPLEMENTATION_PLAN.md) (phased build plan) · [`08-knowledge/llmhandsoff.md`](08-knowledge/llmhandsoff.md) (lessons learned).
 
 ---
 
@@ -51,122 +52,27 @@ Supporting infra: **Redis** (cache), **MinIO / S3** (documents/signatures), **Do
 
 ---
 
-## 3. Backend Architecture (.NET 9)
+## 3. Layer Architecture Breakdown
 
-Clean/onion layering. **Dependency flow is strictly inward:** `Api → Application → Domain` and `Api → Infrastructure → Application/Domain`.
+Deep-dive architecture for each service lives in its own doc (search by layer):
 
-### 3.1 Projects & responsibilities
-
-```
-src/backend/
-├── Karry.sln
-├── Directory.Build.props          # shared: net9.0, nullable, TreatWarningsAsErrors
-├── Karry.Domain/                  # NO external deps — pure domain
-│   ├── Common/                    # BaseEntity, ValueObject, ITenantScoped,
-│   │                              # IRepository<T>, IUnitOfWork, ICurrentTenant/User, IAuditableEntity
-│   ├── Tenants/Tenant.cs
-│   ├── Units/Measure.cs           # m³ ↔ Tonnes toggle (value object)
-│   ├── Equipment/Machine.cs       # "graph node engine" + downstream edges
-│   └── Maintenance/WearPart.cs    # hybrid maintenance + RUL
-├── Karry.Application/             # use cases, MediatR, FluentValidation
-│   ├── DependencyInjection.cs
-│   └── Units/Commands/            # ConvertMeasure (request, validator, command+handler)
-├── Karry.Infrastructure/          # EF Core, repos, tenant context, redis, math client
-│   ├── Persistence/               # KarryDbContext, configurations, factory, GenericRepository
-│   └── Context/TenantContext.cs   # ICurrentTenant + ICurrentUser from HttpContext
-├── Karry.MathEngine.Client/       # typed HttpClient + options for the Python engine
-└── Karry.Api/                     # host: JWT, Serilog, Swagger, middleware, controllers
-```
-
-### 3.2 Key architectural decisions
-
-| Decision | Rationale |
+| Layer | Architecture doc |
 |---|---|
-| **DDD layers, inward-only deps** | Testability, separation of concerns; domain pure C# |
-| **MediatR + FluentValidation** in Application | Decouples controllers from use cases; validation centralized |
-| **EF Core + PostgreSQL/PostGIS** | Spatial blast grids; RLS; mature relational modeling |
-| **Repository + UnitOfWork via `DbContext`** | `KarryDbContext` itself implements `IUnitOfWork`; generic `IRepository<T>` |
-| **Tenant isolation** | `ICurrentTenant` resolved per request; domain entities implement `ITenantScoped`; DB writes stamped on add. (Full RLS enforcement: Phase 1) |
-| **Math logic delegated to Python** | Numerical fidelity + NumPy for future DCG solvers; isolated, independently scaleable |
-| **Value object for units (`Measure`)** | Encapsulates the dynamic unit toggle semantics in one testable place |
+| **Backend (.NET 9)** | [`03-backend/01-architecture.md`](03-backend/01-architecture.md) (+ domain `02`, API `03`, database `04`) |
+| **Frontend (React PWA)** | [`04-frontend/01-architecture.md`](04-frontend/01-architecture.md) |
+| **Math Engine (Python)** | [`05-math-engine/01-architecture.md`](05-math-engine/01-architecture.md) |
+| **Infrastructure / DevOps** | [`06-infrastructure/01-architecture.md`](06-infrastructure/01-architecture.md) |
 
-### 3.3 DI composition
-
-- `Karry.Application.DependencyInjection.AddApplication()` → MediatR + validators.
-- `Karry.MathEngine.Client.DependencyInjection.AddMathEngineClient(config)` → `MathEngineOptions` + `HttpClient<KarryMathEngineClient>`.
-- `Karry.Infrastructure.DependencyInjection.AddInfrastructure(config)` → `IHttpContextAccessor`, `TenantContext` (as both `ICurrentTenant` + `ICurrentUser`), `KarryDbContext`, `GenericRepository` for `IRepository<>`, `IUnitOfWork`, Redis.
-- `Program.cs` wires everything, adds JWT bearer + Swagger, Serilog, and calls `MigrateDatabaseAsync` (auto-migrate on in Development).
-
-### 3.4 Persistence details
-
-- `KarryDbContext : DbContext, IUnitOfWork`
-- Configurations via `IEntityTypeConfiguration<T>` (`Machine`, `WearPart`, `Tenant`) — table-per-entity (`machines`, `wear_parts`, `tenants`).
-- `KarryDbContextFactory : IDesignTimeDbContextFactory<KarryDbContext>` for headless EF migrations.
-- Npgsql + `UseNetTopologySuite()` (PostGIS geometry support ready for blast grids).
-
-### 3.5 Current API surface (Phase 0)
-
-| Endpoint | Method | Auth | Purpose |
-|---|---|---|---|
-| `/api/units/convert` | POST | JWT | Dynamic m³ ↔ Tonnes conversion (M = V × ρ × κ_moisture) |
-| `/swagger` | GET | – | Swagger UI |
+Core principles:
+- Backend: Clean/onion layering with **strictly inward** dependency flow (`Api → Application → Domain`, `Api → Infrastructure → Application/Domain`).
+- Math engine: **stateless HTTP microservice**; the .NET API owns persistence, the engine computes and returns JSON.
+- Frontend: offline-first PWA with feature-first code organization.
 
 ---
 
-## 4. Math Engine Architecture (Python)
+## 4. Data Model (Phase 1 target — entities planned)
 
-Decision: **stateless HTTP microservice** behind the .NET API — the API is the single source of truth for persistence; the math engine computes and returns JSON.
-
-```
-src/math-engine/
-├── pyproject.toml          # fastapi, uvicorn, numpy, pydantic; dev: pytest, httpx, ruff
-├── conftest.py             # ensures `app` package importable by pytest
-├── app/
-│   ├── main.py             # FastAPI app: /health, /engine/conveyor, /engine/rul
-│   ├── core/
-│   │   ├── conveyor.py     # compute_q_belt(...)
-│   │   └── rul.py          # compute_rul_days(...)
-│   └── schemas/__init__.py # Pydantic request/response models (snake_case)
-└── tests/                  # unit + API tests
-```
-
-### 4.1 Contracts (snake_case JSON, mirrors codex)
-
-- `POST /engine/conveyor` → `{"q_nominal", "phi_wear", "psi_inclination", "omega_weather"}` → `{ "q_belt" }`
-- `POST /engine/rul` → `{ "rating_usage", "accumulated_usage", "daily_usage", "rating_mass", "processed_mass", "daily_mass", "bond_abrasion_index" }` → `{ "rul_days" }`
-
-The .NET `KarryMathEngineClient` uses `JsonPropertyName` to map these snake_case fields.
-
----
-
-## 5. Frontend Architecture (React PWA)
-
-```
-src/frontend/
-├── index.html · vite.config.ts · tailwind.config.js · postcss.config.js
-├── public/                 # favicon.svg, pwa-192x192.svg
-├── src/
-│   ├── main.tsx            # boots React, registers service worker
-│   ├── app/router.tsx      # React Router (createBrowserRouter) + AppShell
-│   ├── components/layout/AppShell.tsx
-│   ├── features/
-│   │   ├── home/HomePage.tsx
-│   │   └── units/          # UnitToggle.tsx, convert.ts (pure), convert.test.ts
-│   ├── lib/api.ts          # fetch-based API client (VITE_API_BASE_URL or /api proxy)
-│   └── vite-env.d.ts
-```
-
-- **PWA/offline-first**: `vite-plugin-pwa` (auto generateSW). Service worker + manifest.
-- **Dev proxy**: `/api → localhost:5000`, `/engine → localhost:8000` (only in dev via `server.proxy`).
-- **Path alias**: `@/* → src/*`.
-- **State/offline**: Zustand + Dexie (IndexedDB) pulled in for Phase-2 offline shift queue.
-- **Styling**: Tailwind (`primary #142d55`, `accent #2980b9`; default `slate` scale).
-
----
-
-## 6. Data Model (Phase 1 target — entities planned)
-
-The Phase 0 backend already seeds the domain types; Phase 1 adds the full schema. Planned core tables (see `IMPLEMENTATION_PLAN.md §4.1`):
+The Phase 0 backend already seeds the domain types; Phase 1 adds the full schema. Planned core tables (see [`01-planning/IMPLEMENTATION_PLAN.md`](01-planning/IMPLEMENTATION_PLAN.md) §4.1, or the backend [`03-backend/04-database.md`](03-backend/04-database.md)):
 
 - **Identity/Tenancy**: `tenants`, `users`, `roles`, `permissions`, `role_permissions`
 - **Site/Blast**: `sites`, `blast_patterns` (PostGIS `geometry`), `blasts`, `production_runs`
@@ -177,7 +83,7 @@ The Phase 0 backend already seeds the domain types; Phase 1 adds the full schema
 - **PKI**: `signatures`, `signed_documents`
 - **Weather/Analytics**: `weather_forecasts`, `production_telemetry`
 
-### 6.1 Tenancy strategy
+### 4.1 Tenancy strategy
 
 - Every tenant-scoped table gets a `tenant_id` + PostgreSQL Row-Level Security (RLS).
 - `TenantContextMiddleware` exposes the JWT `tenant_id` claim via `HttpContext.Items`.
@@ -189,7 +95,7 @@ The Phase 0 backend already seeds the domain types; Phase 1 adds the full schema
 
 ---
 
-## 7. Cross-Cutting Concerns
+## 5. Cross-Cutting Concerns
 
 | Concern | Approach |
 |---|---|
@@ -203,7 +109,7 @@ The Phase 0 backend already seeds the domain types; Phase 1 adds the full schema
 
 ---
 
-## 8. Build, Run & CI
+## 6. Build, Run & CI
 
 ### Local run
 ```bash
@@ -220,7 +126,7 @@ Four jobs: `backend`, `frontend`, `math-engine`, `docker-images`. Runs on push/P
 
 ---
 
-## 9. Evolution Roadmap (next phases)
+## 7. Evolution Roadmap (next phases)
 
 | Phase | Scope |
 |---|---|
@@ -232,10 +138,8 @@ Four jobs: `backend`, `frontend`, `math-engine`, `docker-images`. Runs on push/P
 
 ---
 
-## 10. Style & Contribution Notes
+## 8. Style & Contribution Notes
 
-- **.NET**: file-scoped namespaces, expression-bodied where single-line, no XML-doc warnings (`NoWarn=1591`), `TreatWarningsAsErrors`.
-- **Frontend**: ESLint flat config (typescript-eslint), Prettier (semi, single-quote, trailing-comma all), Vitest.
-- **Python**: Ruff (`E,F,W,I,UP,B,SIM`, line-length 120), a `conftest.py` at project root so pytest can import `app`.
-- When you change architecture, update **this** file (`architecture.md`) **and** append to `llmhandsoff.md`.
-- Document each completed phase in a `docs/phaseN-<slug>.md` log.
+- Per-layer style rules live in each layer's architecture doc ([backend](03-backend/01-architecture.md), [frontend](04-frontend/01-architecture.md), [math](05-math-engine/01-architecture.md)).
+- When you change architecture, update the relevant **layer doc** (this overview if cross-cutting) **and** append to [`08-knowledge/llmhandsoff.md`](08-knowledge/llmhandsoff.md).
+- Document each completed phase in `07-execution/phaseN-<slug>.md`.

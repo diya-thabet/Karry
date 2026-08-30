@@ -4,14 +4,14 @@
 
 Karry is a multi-tenant, offline-first SaaS for aggregate quarries, sand washing plants, and open-pit mining operations. It ties field extraction → crusher plant → weighbridge → warehouses → shift controllers → executive financial ledgers into a tamper-proof intelligence system.
 
-See [`docs/codex.tex`](docs/codex.tex) for the canonical domain specification and [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md) for the phased build plan.
+See [`docs/02-reference/codex.tex`](docs/02-reference/codex.tex) for the canonical domain specification, [`docs/01-planning/IMPLEMENTATION_PLAN.md`](docs/01-planning/IMPLEMENTATION_PLAN.md) for the phased build plan, and [`docs/README.md`](docs/README.md) for the searchable docs index.
 
 ---
 
 ## Repository Layout
 
 ```
-├── docs/                        # Design docs (codex.tex, IMPLEMENTATION_PLAN.md)
+├── docs/                        # Layer-based docs — see docs/README.md (index)
 ├── .github/workflows/ci.yml     # CI pipeline
 ├── infra/
 │   ├── compose.yaml             # Local dev stack
@@ -121,4 +121,4 @@ Phase 0 — **Foundations & Tooling** — scaffolded:
 - [x] `.env.example`, `.gitignore`
 - [x] Makefile task runner
 
-Next: **Phase 1 — Data Platform & RBAC** (see `docs/IMPLEMENTATION_PLAN.md`).
+Next: **Phase 1 — Data Platform & RBAC** (see `docs/01-planning/IMPLEMENTATION_PLAN.md`).
