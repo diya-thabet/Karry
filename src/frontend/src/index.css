@@ -14,5 +14,21 @@ body,
 }
 
 body {
-  @apply bg-slate-50 text-slate-900 antialiased;
+  @apply bg-surface font-sans text-ink antialiased;
+}
+
+@layer base {
+  * {
+    @apply border-ink/10;
+  }
+}
+
+@layer components {
+  .focus-ring {
+    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1;
+  }
+
+  .card-surface {
+    @apply rounded-xl border border-ink/10 bg-white shadow-card;
+  }
 }

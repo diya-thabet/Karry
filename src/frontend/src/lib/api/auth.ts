@@ -1,14 +1,14 @@
 import { httpRequest } from '@/lib/http';
 import type {
+  CurrentSession,
+  EnableTwoFactorResponse,
   LoginRequest,
   LoginResponse,
   RefreshResponse,
   TwoFactorLoginRequest,
-  TwoFactorLoginResponse,
-} from './types';
+} from '@/features/auth/types';
 
 const DEVICE_KEY = 'karry.deviceId';
-export const TOKEN_STORAGE_KEY = 'karry.auth';
 
 export function getDeviceId(): string {
   if (typeof localStorage === 'undefined') {
@@ -36,8 +36,8 @@ export function login(request: LoginRequest): Promise<LoginResponse> {
   });
 }
 
-export function twoFactorLogin(request: TwoFactorLoginRequest): Promise<TwoFactorLoginResponse> {
-  return httpRequest<TwoFactorLoginResponse>('/auth/two-factor/login', {
+export function twoFactorLogin(request: TwoFactorLoginRequest): Promise<LoginResponse> {
+  return httpRequest<LoginResponse>('/auth/two-factor/login', {
     method: 'POST',
     json: request,
     idempotent: true,
@@ -56,16 +56,42 @@ export function refresh(refreshToken: string): Promise<RefreshResponse> {
 export function logout(refreshToken: string, accessToken: string): Promise<void> {
   return httpRequest<void>('/auth/logout', {
     method: 'POST',
-    json: { refreshToken, deviceId: getDeviceId() },
+    json: { refreshToken },
     token: accessToken,
     idempotent: true,
     idempotencyKey: `logout:${refreshToken}`,
   });
 }
 
-export function twoFactorEnable(accessToken: string): Promise<never> {
-  return httpRequest('/auth/two-factor/enable', {
+export function getCurrentSession(accessToken: string): Promise<CurrentSession> {
+  return httpRequest<CurrentSession>('/auth/me', {
+    method: 'GET',
+    token: accessToken,
+  });
+}
+
+export function enableTwoFactor(accessToken: string): Promise<EnableTwoFactorResponse> {
+  return httpRequest<EnableTwoFactorResponse>('/auth/two-factor/enable', {
     method: 'POST',
+    json: { deviceId: getDeviceId() },
+    token: accessToken,
+    idempotent: true,
+  });
+}
+
+export function verifyTwoFactor(accessToken: string, secret: string, code: string): Promise<void> {
+  return httpRequest<void>('/auth/two-factor/verify', {
+    method: 'POST',
+    json: { secret, code },
+    token: accessToken,
+    idempotent: true,
+  });
+}
+
+export function disableTwoFactor(accessToken: string): Promise<void> {
+  return httpRequest<void>('/auth/two-factor/disable', {
+    method: 'POST',
+    json: {},
     token: accessToken,
     idempotent: true,
   });

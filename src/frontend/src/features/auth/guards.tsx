@@ -22,3 +22,29 @@ export function GuestOnly({ children }: { children: ReactNode }) {
 
   return <>{children}</>;
 }
+
+/**
+ * Gated by an RBAC permission (e.g. `users:write`) rather than a nav link, so the
+ * route only renders when the caller holds the required capability. Permissions are
+ * formatted `resource:action` (see `/api/auth/me`).
+ */
+export function RequirePermission({
+  permission,
+  children,
+}: {
+  permission: string;
+  children: ReactNode;
+}) {
+  const permissions = useAuthStore((s) => s.permissions);
+  const isAuthenticated = useAuthStore(selectIsAuthenticated);
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!permissions.includes(permission)) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <>{children}</>;
+}

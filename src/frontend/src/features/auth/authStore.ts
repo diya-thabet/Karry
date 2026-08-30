@@ -1,22 +1,24 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { TokenPair } from './types';
+import type { CurrentSession, TokenPair } from './types';
 
 export interface AuthState {
   accessToken: string | null;
   refreshToken: string | null;
   refreshTokenId: string | null;
   userId: string | null;
-  roleCode: string | null;
   email: string | null;
-  setSession: (
+  name: string | null;
+  roleCode: string | null;
+  tenantId: string | null;
+  isPlatformAdmin: boolean;
+  twoFactorEnabled: boolean;
+  permissions: string[];
+  setTokens: (
     tokens: TokenPair,
-    userId: string | null,
-    roleCode: string | null,
-    email: string | null,
+    session: { userId: string | null; roleCode: string | null; email: string | null },
   ) => void;
-  updateTokens: (tokens: TokenPair) => void;
-  setEmail: (email: string) => void;
+  setCurrentSession: (session: CurrentSession) => void;
   clear: () => void;
 }
 
@@ -27,27 +29,35 @@ export const useAuthStore = create<AuthState>()(
       refreshToken: null,
       refreshTokenId: null,
       userId: null,
-      roleCode: null,
       email: null,
+      name: null,
+      roleCode: null,
+      tenantId: null,
+      isPlatformAdmin: false,
+      twoFactorEnabled: false,
+      permissions: [],
 
-      setSession: (tokens, userId, roleCode, email) =>
+      setTokens: (tokens, session) =>
         set({
           accessToken: tokens.accessToken,
           refreshToken: tokens.refreshToken,
           refreshTokenId: tokens.refreshTokenId,
-          userId,
-          roleCode,
-          email,
+          userId: session.userId,
+          email: session.email,
+          roleCode: session.roleCode,
         }),
 
-      updateTokens: (tokens) =>
+      setCurrentSession: (session) =>
         set({
-          accessToken: tokens.accessToken,
-          refreshToken: tokens.refreshToken,
-          refreshTokenId: tokens.refreshTokenId,
+          userId: session.userId,
+          email: session.email,
+          name: session.name,
+          tenantId: session.tenantId,
+          roleCode: session.roleCode,
+          isPlatformAdmin: session.isPlatformAdmin,
+          twoFactorEnabled: session.twoFactorEnabled,
+          permissions: session.permissions,
         }),
-
-      setEmail: (email) => set({ email }),
 
       clear: () =>
         set({
@@ -55,8 +65,13 @@ export const useAuthStore = create<AuthState>()(
           refreshToken: null,
           refreshTokenId: null,
           userId: null,
-          roleCode: null,
           email: null,
+          name: null,
+          roleCode: null,
+          tenantId: null,
+          isPlatformAdmin: false,
+          twoFactorEnabled: false,
+          permissions: [],
         }),
     }),
     {
@@ -66,8 +81,13 @@ export const useAuthStore = create<AuthState>()(
         refreshToken: state.refreshToken,
         refreshTokenId: state.refreshTokenId,
         userId: state.userId,
-        roleCode: state.roleCode,
         email: state.email,
+        name: state.name,
+        roleCode: state.roleCode,
+        tenantId: state.tenantId,
+        isPlatformAdmin: state.isPlatformAdmin,
+        twoFactorEnabled: state.twoFactorEnabled,
+        permissions: state.permissions,
       }),
     },
   ),

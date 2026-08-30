@@ -1,5 +1,4 @@
-import { ApiError, httpRequest } from '@/lib/http';
-import { getAccessToken } from '@/features/auth/tokenManager';
+import { httpRequest } from '@/lib/http';
 
 export interface ConvertMeasureRequest {
   value: number;
@@ -15,17 +14,31 @@ export interface ConvertMeasureResponse {
   appliedMoistureFactor: number;
 }
 
+export interface SetUnitPreferencesRequest {
+  massUnit?: string | null;
+  volumeUnit?: string | null;
+}
+
 export async function convertMeasure(
+  accessToken: string | null,
   payload: ConvertMeasureRequest,
 ): Promise<ConvertMeasureResponse> {
-  const token = await getAccessToken();
-
   return httpRequest<ConvertMeasureResponse>('/units/convert', {
     method: 'POST',
     json: payload,
-    token,
+    token: accessToken,
     idempotent: true,
   });
 }
 
-export { ApiError };
+export function setUnitPreferences(
+  accessToken: string,
+  request: SetUnitPreferencesRequest,
+): Promise<void> {
+  return httpRequest<void>('/units/preferences', {
+    method: 'PUT',
+    json: request,
+    token: accessToken,
+    idempotent: true,
+  });
+}

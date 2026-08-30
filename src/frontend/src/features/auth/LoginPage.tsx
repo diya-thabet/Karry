@@ -1,12 +1,18 @@
 import { FormEvent, useState } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/Button';
+import { Field } from '@/components/ui/Field';
+import { Input } from '@/components/ui/Input';
+import { Alert } from '@/components/ui/Alert';
 import { selectIsAuthenticated, useAuthStore } from './authStore';
-import { getDeviceId, login, twoFactorLogin } from './api';
+import { useAuth } from './useAuth';
+import { getDeviceId, login, twoFactorLogin } from '@/lib/api';
 import type { LoginResponse } from './types';
 
 export function LoginPage() {
   const isAuthenticated = useAuthStore(selectIsAuthenticated);
-  const setSession = useAuthStore((s) => s.setSession);
+  const setTokens = useAuthStore((s) => s.setTokens);
+  const refreshSession = useAuth().refreshSession;
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -23,6 +29,20 @@ export function LoginPage() {
     return <Navigate to="/" replace />;
   }
 
+  async function completeAuth(response: LoginResponse) {
+    if (!response.tokens) return;
+    setTokens(response.tokens, {
+      userId: response.userId,
+      roleCode: response.roleCode,
+      email,
+    });
+    try {
+      await refreshSession();
+    } finally {
+      navigate(from, { replace: true });
+    }
+  }
+
   async function handleLogin(event: FormEvent) {
     event.preventDefault();
     setError(null);
@@ -31,29 +51,20 @@ export function LoginPage() {
     try {
       if (challenge) {
         const response = await twoFactorLogin({
-          challengeToken: challenge.challengeToken ?? '',
-          code: twoFactorCode,
+          email,
+          code: twoFactorCode.trim(),
           deviceId: getDeviceId(),
         });
-        if (!challenge.userId) {
-          setError('Unable to complete login.');
-          return;
-        }
-        setSession(response.tokens, challenge.userId, challenge.roleCode, email);
-        navigate(from, { replace: true });
+        await completeAuth(response);
         return;
       }
 
       const response = await login({ email, password, deviceId: getDeviceId() });
-      if (response.requiresTwoFactor) {
+      if (response.requiresTwoFactor && !response.tokens) {
         setChallenge(response);
         return;
       }
-
-      if (response.tokens) {
-        setSession(response.tokens, response.userId, response.roleCode, email);
-        navigate(from, { replace: true });
-      }
+      await completeAuth(response);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed.');
     } finally {
@@ -63,73 +74,92 @@ export function LoginPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-primary px-4">
-      <div className="w-full max-w-sm rounded-lg bg-white p-8 shadow-xl">
-        <h1 className="mb-1 text-2xl font-bold text-slate-800">Karry Platform</h1>
-        <p className="mb-6 text-sm text-slate-500">
-          {challenge ? 'Enter your two-factor code' : 'Sign in to continue'}
-        </p>
+      <div className="w-full max-w-sm">
+        <div className="mb-6 text-center">
+          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 text-2xl font-black text-white">
+            K
+          </div>
+          <h1 className="text-2xl font-bold text-white">Karry Platform</h1>
+          <p className="mt-1 text-sm text-white/70">Enterprise quarry &amp; mining management</p>
+        </div>
 
-        <form onSubmit={handleLogin} className="space-y-4" aria-busy={loading}>
-          {!challenge ? (
-            <>
-              <label className="block">
-                <span className="mb-1 block text-sm text-slate-600">Email</span>
-                <input
-                  type="email"
-                  required
-                  autoComplete="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded border border-slate-300 px-3 py-2"
-                />
-              </label>
+        <div className="rounded-2xl bg-white p-8 shadow-card">
+          <h2 className="mb-1 text-lg font-semibold text-ink">
+            {challenge ? 'Two-factor verification' : 'Sign in to your account'}
+          </h2>
+          <p className="mb-6 text-sm text-ink-muted">
+            {challenge
+              ? 'Enter the code from your authenticator app to continue.'
+              : 'Enter your credentials to access the platform.'}
+          </p>
 
-              <label className="block">
-                <span className="mb-1 block text-sm text-slate-600">Password</span>
-                <input
-                  type="password"
-                  required
-                  autoComplete="current-password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded border border-slate-300 px-3 py-2"
-                />
-              </label>
-            </>
-          ) : (
-            <>
-              <label className="block">
-                <span className="mb-1 block text-sm text-slate-600">Authenticator code</span>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  autoComplete="one-time-code"
-                  value={twoFactorCode}
-                  onChange={(e) => setTwoFactorCode(e.target.value)}
-                  className="w-full rounded border border-slate-300 px-3 py-2"
-                />
-              </label>
-
-              <button
-                type="button"
-                onClick={() => setChallenge(null)}
-                className="text-sm text-accent hover:underline"
-              >
-                Back to sign in
-              </button>
-            </>
+          {error && (
+            <Alert tone="error" className="mb-4">
+              {error}
+            </Alert>
           )}
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          <form onSubmit={handleLogin} className="space-y-4" aria-busy={loading}>
+            {!challenge ? (
+              <>
+                <Field label="Email" htmlFor="email" required>
+                  <Input
+                    id="email"
+                    type="email"
+                    required
+                    autoComplete="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </Field>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded bg-accent px-4 py-2 font-medium text-white transition hover:bg-primary disabled:opacity-50"
-          >
-            {loading ? 'Please wait…' : challenge ? 'Verify' : 'Sign in'}
-          </button>
-        </form>
+                <Field label="Password" htmlFor="password" required>
+                  <Input
+                    id="password"
+                    type="password"
+                    required
+                    autoComplete="current-password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </Field>
+              </>
+            ) : (
+              <>
+                <Field
+                  label="Authenticator code"
+                  htmlFor="2fa"
+                  required
+                  hint="6-digit code from your app"
+                >
+                  <Input
+                    id="2fa"
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    value={twoFactorCode}
+                    onChange={(e) => setTwoFactorCode(e.target.value)}
+                  />
+                </Field>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setChallenge(null);
+                    setTwoFactorCode('');
+                  }}
+                  className="text-sm text-accent hover:underline"
+                >
+                  Back to sign in
+                </button>
+              </>
+            )}
+
+            <Button type="submit" fullWidth loading={loading}>
+              {challenge ? 'Verify' : 'Sign in'}
+            </Button>
+          </form>
+        </div>
       </div>
     </div>
   );

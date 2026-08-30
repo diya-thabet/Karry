@@ -1,5 +1,5 @@
 import { useAuthStore } from './authStore';
-import { refresh } from './api';
+import { refresh } from '@/lib/api';
 
 let refreshInFlight: Promise<string | null> | null = null;
 
@@ -32,7 +32,12 @@ export async function getAccessToken(): Promise<string | null> {
 async function doRefresh(refreshToken: string): Promise<string | null> {
   try {
     const pair = await refresh(refreshToken);
-    useAuthStore.getState().updateTokens(pair);
+    const current = useAuthStore.getState();
+    current.setTokens(pair, {
+      userId: current.userId,
+      roleCode: current.roleCode,
+      email: current.email,
+    });
     return pair.accessToken;
   } catch {
     useAuthStore.getState().clear();
