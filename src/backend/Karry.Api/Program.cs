@@ -88,6 +88,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseSerilogRequestLogging();
 
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 app.UseMiddleware<TenantContextMiddleware>();
 
 app.UseHttpsRedirection();

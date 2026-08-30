@@ -7,8 +7,8 @@ public static class DatabaseExtensions
 {
     /// <summary>
     /// Applies pending EF Core migrations on startup when <c>Database:AutoMigrate</c> is true,
-    /// and runs the optional seed callback. In production, prefer running migrations explicitly
-    /// in the deployment pipeline instead of on every app start.
+    /// and seeds baseline data when <c>Seed:Enabled</c> is true. In production, prefer running
+    /// migrations explicitly in the deployment pipeline instead of on every app start.
     /// </summary>
     public static async Task MigrateDatabaseAsync(this WebApplication app, IConfiguration configuration)
     {
@@ -21,5 +21,11 @@ public static class DatabaseExtensions
         var dbContext = scope.ServiceProvider.GetRequiredService<KarryDbContext>();
 
         await dbContext.Database.MigrateAsync();
+
+        if (configuration.GetValue<bool>("Seed:Enabled"))
+        {
+            var seeder = scope.ServiceProvider.GetRequiredService<DbSeeder>();
+            await seeder.SeedAsync();
+        }
     }
 }

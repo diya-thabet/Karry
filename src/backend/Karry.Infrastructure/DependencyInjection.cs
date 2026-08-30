@@ -38,6 +38,7 @@ public static class DependencyInjection
         services.AddScoped<RowLevelSecurityInterceptor>();
         services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<KarryDbContext>());
+        services.AddScoped<DbSeeder>();
 
         services.AddScoped<IClock, SystemClock>();
         services.AddScoped<ISecureRandom, SecureRandom>();

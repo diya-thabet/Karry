@@ -32,4 +32,14 @@ public class UnitsController : ControllerBase
 
         return Ok(result);
     }
+
+    /// <summary>Sets the caller's per-user display unit override.</summary>
+    [HttpPut("preferences")]
+    public async Task<IActionResult> SetPreferences(
+        [FromBody] SetUnitPreferencesRequest request,
+        CancellationToken cancellationToken)
+    {
+        await _mediator.Send(new SetUnitPreferencesCommand(request), cancellationToken);
+        return NoContent();
+    }
 }
