@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Karry.Domain.Common;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,6 +19,19 @@ public sealed class GenericRepository<TEntity> : IRepository<TEntity>
 
     public async Task<IReadOnlyList<TEntity>> ListAsync(CancellationToken cancellationToken = default)
         => await DbContext.Set<TEntity>().AsNoTracking().ToListAsync(cancellationToken);
+
+    public async Task<IReadOnlyList<TEntity>> ListAsync(
+        Expression<Func<TEntity, bool>> predicate,
+        CancellationToken cancellationToken = default)
+        => await DbContext.Set<TEntity>().AsNoTracking().Where(predicate).ToListAsync(cancellationToken);
+
+    public async Task<TEntity?> FirstOrDefaultAsync(
+        Expression<Func<TEntity, bool>> predicate,
+        CancellationToken cancellationToken = default)
+        => await DbContext.Set<TEntity>().FirstOrDefaultAsync(predicate, cancellationToken);
+
+    public async Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
+        => await DbContext.Set<TEntity>().AnyAsync(predicate, cancellationToken);
 
     public Task AddAsync(TEntity entity, CancellationToken cancellationToken = default)
         => DbContext.Set<TEntity>().AddAsync(entity, cancellationToken).AsTask();

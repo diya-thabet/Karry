@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Karry.Domain.Common;
 
 namespace Karry.Domain.Common;
@@ -11,6 +12,16 @@ public interface IRepository<TEntity>
     Task<TEntity?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<TEntity>> ListAsync(CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<TEntity>> ListAsync(
+        Expression<Func<TEntity, bool>> predicate,
+        CancellationToken cancellationToken = default);
+
+    Task<TEntity?> FirstOrDefaultAsync(
+        Expression<Func<TEntity, bool>> predicate,
+        CancellationToken cancellationToken = default);
+
+    Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default);
 
     Task AddAsync(TEntity entity, CancellationToken cancellationToken = default);
 
