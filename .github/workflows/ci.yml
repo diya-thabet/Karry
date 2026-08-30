@@ -78,6 +78,50 @@ jobs:
       - name: Test
         run: pytest
 
+  integration:
+    name: Backend Integration (Postgres)
+    runs-on: ubuntu-latest
+    env:
+      ConnectionStrings__KarryDatabase: "Host=localhost;Port=5432;Database=karry;Username=karry;Password=karry_dev"
+      Database__AutoMigrate: "true"
+      Seed__Enabled: "true"
+      Seed__AdminPassword: "Karry#RootAdmin1"
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: karry
+          POSTGRES_PASSWORD: karry_dev
+          POSTGRES_DB: karry
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U karry"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    defaults:
+      run:
+        working-directory: src/backend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      - name: Restore
+        run: dotnet restore Karry.IntegrationTests.sln
+      - name: Build
+        run: dotnet build Karry.IntegrationTests.sln --configuration Release --no-restore
+      - name: Run integration tests
+        run: dotnet test Karry.IntegrationTests.sln --configuration Release --no-build --logger "trx;LogFileName=integration-results.trx"
+      - name: Upload integration test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: integration-test-results
+          path: src/backend/**/TestResults/*.trx
+
   docker-images:
     name: Docker image build & push
     runs-on: ubuntu-latest

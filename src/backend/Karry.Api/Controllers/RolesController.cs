@@ -1,4 +1,5 @@
 using Karry.Application.Roles.Commands;
+using Karry.Application.Roles.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,6 +17,11 @@ public sealed class RolesController : ControllerBase
     {
         _mediator = mediator;
     }
+
+    /// <summary>Lists roles within the caller's tenant.</summary>
+    [HttpGet]
+    public async Task<ActionResult<IReadOnlyList<RoleResponse>>> List(CancellationToken cancellationToken)
+        => Ok(await _mediator.Send(new ListRolesQuery(), cancellationToken));
 
     /// <summary>Creates a custom role within the caller's tenant.</summary>
     [HttpPost]
