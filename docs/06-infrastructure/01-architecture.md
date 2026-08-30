@@ -30,7 +30,7 @@ Runs on push/PR to `main` / `develop` — four jobs:
 - **backend** — restore → build → test (uploads TRX results)
 - **frontend** — lint → format:check → typecheck → test → build (PWA)
 - **math-engine** — pip install -e '.[dev]' → ruff → pytest
-- **docker-images** — builds all three service images (needs the three jobs)
+- **docker-images** — **on pushes only** (skipped on PRs): builds all three service images (Buildx + GHA cache) and **pushes to Docker Hub** (`dhiathabet/karry-*`, tagged `latest` + commit SHA). Requires the `DOCKERHUB_USERNAME` / `DOCKERHUB_TOKEN` repo secrets.
 
 ## Local utility
 

@@ -4,6 +4,7 @@ Layer-based docs structure. **New docs:** put them in the matching layer folder 
 
 | Folder | Layer | What you'll find here |
 |---|---|---|
+| [`00-guidelines/`](00-guidelines/) | Guidelines | Guides for contributors & LLMs — read [`01-docs-structure.md`](00-guidelines/01-docs-structure.md) first |
 | [`01-planning/`](01-planning/) | Planning | Phased build plans, project roadmap |
 | [`02-reference/`](02-reference/) | Reference | Canonical domain & math specification |
 | [`03-backend/`](03-backend/) | Backend | .NET services: architecture, domain, API, database |
@@ -18,6 +19,7 @@ Layer-based docs structure. **New docs:** put them in the matching layer folder 
 
 | Subject | Where to look |
 |---|---|
+| Where to put a new doc (for LLMs/agents) | `00-guidelines/01-docs-structure.md` |
 | System overview / how layers fit | `architecture.md` |
 | Build plan / phases / roadmap | `01-planning/IMPLEMENTATION_PLAN.md` |
 | Domain formulas, units, DCG math, codex | `02-reference/codex.tex` |
