@@ -1,3 +1,6 @@
+import { ApiError, httpRequest } from '@/lib/http';
+import { getAccessToken } from '@/features/auth/tokenManager';
+
 export interface ConvertMeasureRequest {
   value: number;
   fromUnit: string;
@@ -12,21 +15,17 @@ export interface ConvertMeasureResponse {
   appliedMoistureFactor: number;
 }
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '/api';
-
 export async function convertMeasure(
   payload: ConvertMeasureRequest,
 ): Promise<ConvertMeasureResponse> {
-  const response = await fetch(`${API_BASE}/units/convert`, {
+  const token = await getAccessToken();
+
+  return httpRequest<ConvertMeasureResponse>('/units/convert', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
+    json: payload,
+    token,
+    idempotent: true,
   });
-
-  if (!response.ok) {
-    const detail = await response.text();
-    throw new Error(`Conversion failed (${response.status}): ${detail}`);
-  }
-
-  return response.json();
 }
+
+export { ApiError };
